@@ -15,16 +15,21 @@ window.CHALLENGES_MEDIUM = {
       "description": "Take a skyline picture, best one gets bonus points",
       "category": "medium",
       "basePoints": 3,
-      "bonusPoints": {"criteria": "Best skyline photo", "points": 5},
+      "bonuses": [
+        {"criteria": "Best skyline photo", "points": 5}
+      ],
       "requirements": []
     },
     {
       "id": "medium-003",
       "title": "Draw a skyline picture",
-      "description": "Draw a skyline picture and post it in the group. If your team knows where it is, you get a bonus point. Team with most correct guesses gets extra bonus points",
+      "description": "Draw a skyline picture and post it in the group. If your team knows where it is, you get a bonus point. Then, send it in the partiful chat and ask the other team's where they think it is. Team with most correct guesses gets extra bonus points",
       "category": "medium",
       "basePoints": 3,
-      "bonusPoints": {"criteria": "Team guesses correctly: 2 points. Most correct guesses overall: TBD", "points": 2},
+      "bonuses": [
+        {"criteria": "Each team that guesses correctly", "points": 2},
+        {"criteria": "Most correct guesses overall", "points": "6"}
+      ],
       "requirements": []
     },
     {
@@ -33,7 +38,9 @@ window.CHALLENGES_MEDIUM = {
       "description": "Get pizza slices from 3 different locations. Team that gets furthest distance as crow flies between slices gets bonus points (sum each distance)",
       "category": "medium",
       "basePoints": 5,
-      "bonusPoints": {"criteria": "Furthest total distance between all 3 locations", "points": "TBD"},
+      "bonuses": [
+        {"criteria": "Furthest total distance between all 3 locations", "points": "10"}
+      ],
       "requirements": ["Calculate total perimeter distance. I can't do math"]
     },
     {
@@ -50,7 +57,9 @@ window.CHALLENGES_MEDIUM = {
       "description": "Go to a university campus and pass a test. Everyone take a random quiz on sporcle.com. If a majority (or exactly half) of your team passes, get 2x points",
       "category": "medium",
       "basePoints": 4,
-      "bonusPoints": {"criteria": "Majority or half of team passes", "points": 4},
+      "bonuses": [
+        {"criteria": "Majority or half of team passes", "points": 4}
+      ],
       "requirements": ["Make sure it's random!", "Everyone should do a DIFFERENT quiz (since it might be impossible for mere mortals)!"]
     },
     {
@@ -59,7 +68,9 @@ window.CHALLENGES_MEDIUM = {
       "description": "Take a picture with a camera from B&H. Best pictures will get bonus points",
       "category": "medium",
       "basePoints": 10,
-      "bonusPoints": {"criteria": "Best photo", "points": 5},
+      "bonuses": [
+        {"criteria": "Best photo", "points": 5}
+      ],
       "requirements": []
     },
     {
@@ -76,7 +87,10 @@ window.CHALLENGES_MEDIUM = {
       "description": "Sing Empire State of Mind in the least NYC-like place. Bonus points for each member that sings together. Bonus for winner. Bonus for how 'least NYC' it is. No video no points!",
       "category": "medium",
       "basePoints": 10,
-      "bonusPoints": {"criteria": "+1 for each member singing, +3 for least NYC location", "points": 4},
+      "bonuses": [
+        {"criteria": "+1 for each member singing", "points": 1},
+        {"criteria": "Least NYC location", "points": 3}
+      ],
       "requirements": []
     },
     {
@@ -133,7 +147,10 @@ window.CHALLENGES_MEDIUM = {
       "description": "Critique and appraise 3 pieces of street art. Best critique gets bonus points. Coolest street art gets bonus points",
       "category": "medium",
       "basePoints": 7,
-      "bonusPoints": {"criteria": "Best critique or coolest art", "points": 5},
+      "bonuses": [
+        {"criteria": "Best critique of the day", "points": 5},
+        {"criteria": "Coolest art of the day", "points": 5}
+      ],
       "requirements": ["Written or video critique required"]
     },
     {
@@ -158,7 +175,9 @@ window.CHALLENGES_MEDIUM = {
       "description": "Show me your meanest mean mug under a bridge",
       "category": "medium",
       "basePoints": 5,
-      "bonusPoints": {"criteria": "Best mean mug", "points": 3},
+      "bonuses": [
+        {"criteria": "Best mean mug", "points": 3}
+      ],
       "requirements": []
     },
     {

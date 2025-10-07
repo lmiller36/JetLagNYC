@@ -7,7 +7,9 @@ window.CHALLENGES_LOCATION = {
       "description": "Take a picture with anyone in a costume in Times Square (bonus for hottest princess)",
       "category": "location-specific",
       "basePoints": 5,
-      "bonusPoints": {"criteria": "Hottest princess", "points": 3},
+      "bonuses": [
+        {"criteria": "Hottest princess", "points": 3}
+      ],
       "locationRestriction": {"type": "neighborhood", "value": "times-square"},
       "requirements": []
     },
@@ -80,7 +82,9 @@ window.CHALLENGES_LOCATION = {
       "description": "Fake a proposal with a view of the Empire State Building (bonus points for most convincing)",
       "category": "location-specific",
       "basePoints": 10,
-      "bonusPoints": {"criteria": "Most convincing proposal", "points": 5},
+      "bonuses": [
+        {"criteria": "Most convincing proposal", "points": 5}
+      ],
       "locationRestriction": {"type": "neighborhood", "value": "manhattan"},
       "requirements": ["Empire State Building must be visible"]
     },
@@ -90,7 +94,10 @@ window.CHALLENGES_LOCATION = {
       "description": "Pick up 10 pieces of trash as a team in Prospect Park (best pile of gold wins). You can do this in any park for 6 points, Prospect Park gets 10",
       "category": "location-specific",
       "basePoints": 6,
-      "bonusPoints": {"criteria": "Best pile of trash/gold", "points": 5},
+      "bonuses": [
+        {"criteria": "Best pile of trash/gold", "points": 5},
+        {"criteria": "Prospected in Prospect Park! Good on you", "points": 4}
+      ],
       "locationRestriction": {"type": "neighborhood", "value": "prospect-park"},
       "requirements": ["Any park: 6 points, Prospect Park: 10 points -> TODO!"]
     },

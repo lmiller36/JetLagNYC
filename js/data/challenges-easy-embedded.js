@@ -47,7 +47,6 @@ window.CHALLENGES_EASY = {
       "description": "Find a non-American flag in New York and say that country's national anthem",
       "category": "easy",
       "basePoints": 4,
-      "bonusPoints": {"criteria": "If you know all the words", "points": 1},
       "requirements": []
     },
     {
@@ -88,7 +87,9 @@ window.CHALLENGES_EASY = {
       "description": "Take a picture of a rat. Fattest rat of the day gets a bonus",
       "category": "easy",
       "basePoints": 5,
-      "bonusPoints": {"criteria": "Fattest rat of the day", "points": 3},
+      "bonuses": [
+        { "criteria": "Fattest rat of the day", "points": 3 }
+      ],
       "requirements": []
     },
     {
@@ -121,7 +122,9 @@ window.CHALLENGES_EASY = {
       "description": "Get at least 40 stories in the air. Highest of the day gets a bonus",
       "category": "easy",
       "basePoints": 8,
-      "bonusPoints": {"criteria": "Highest of the day", "points": 5},
+      "bonuses": [
+        { "criteria": "Highest of the day", "points": 5 }
+      ],
       "requirements": []
     },
     {

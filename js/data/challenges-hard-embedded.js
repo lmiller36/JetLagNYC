@@ -55,7 +55,9 @@ window.CHALLENGES_HARD = {
       "description": "Make money by peddling/selling something. Most money made gets bonus points",
       "category": "hard",
       "basePoints": 13,
-      "bonusPoints": {"criteria": "Most money made", "points": 7},
+      "bonuses": [
+        {"criteria": "Most money made", "points": 7}
+      ],
       "requirements": []
     },
     {

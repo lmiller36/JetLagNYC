@@ -180,12 +180,27 @@
     }
 
     function createChallengeCard(challenge) {
-        const bonusPointsHTML = challenge.bonusPoints ? `
-            <div class="bonus-points">
-                <h4>Bonus: +${challenge.bonusPoints.points} points</h4>
-                <p>${challenge.bonusPoints.criteria}</p>
-            </div>
-        ` : '';
+        let bonusPointsHTML = '';
+        if (challenge.bonuses && challenge.bonuses.length > 0) {
+            bonusPointsHTML = `
+                <div class="bonus-points">
+                    <h4>Bonuses:</h4>
+                    ${challenge.bonuses.map(bonus => `
+                        <div class="bonus-item">
+                            <strong>+${bonus.points} points:</strong> ${bonus.criteria}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else if (challenge.bonusPoints) {
+            // Legacy support for old single bonusPoints format
+            bonusPointsHTML = `
+                <div class="bonus-points">
+                    <h4>Bonus: +${challenge.bonusPoints.points} points</h4>
+                    <p>${challenge.bonusPoints.criteria}</p>
+                </div>
+            `;
+        }
 
         const locationRestrictionHTML = challenge.locationRestriction ? `
             <div class="location-restriction">
