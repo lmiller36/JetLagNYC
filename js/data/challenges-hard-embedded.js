@@ -7,7 +7,7 @@ window.CHALLENGES_HARD = {
       "description": "Go to a museum/gallery and give a fake explanation about a piece to bystanders",
       "category": "hard",
       "basePoints": 15,
-      "requirements": ["Must be in a museum or gallery", "Must convince at least one person", "Video evidence"]
+      "requirements": []
     },
     {
       "id": "hard-002",
@@ -15,7 +15,7 @@ window.CHALLENGES_HARD = {
       "description": "Find a food festival/community event and interview a staff member about it",
       "category": "hard",
       "basePoints": 12,
-      "requirements": ["Must be an organized event", "Interview must be at least 2 minutes", "Video required"]
+      "requirements": []
     },
     {
       "id": "hard-003",
@@ -23,7 +23,7 @@ window.CHALLENGES_HARD = {
       "description": "Create street art using chalk",
       "category": "hard",
       "basePoints": 8,
-      "requirements": ["Must use chalk", "Must be on public sidewalk", "Photo of finished art"]
+      "requirements": []
     },
     {
       "id": "hard-004",
@@ -31,7 +31,7 @@ window.CHALLENGES_HARD = {
       "description": "Make your case to become the new UN secretary general for at least 2 minutes with UN building in sight",
       "category": "hard",
       "basePoints": 10,
-      "requirements": ["UN building must be visible", "Speech must be at least 2 minutes", "Video required"]
+      "requirements": ["UN building must be visible"]
     },
     {
       "id": "hard-005",
@@ -39,7 +39,7 @@ window.CHALLENGES_HARD = {
       "description": "Tour an apartment that will be up for rent soon",
       "category": "hard",
       "basePoints": 15,
-      "requirements": ["Must be an actual apartment tour", "Photo or video evidence"]
+      "requirements": []
     },
     {
       "id": "hard-006",
@@ -47,7 +47,7 @@ window.CHALLENGES_HARD = {
       "description": "Go to an airport and pretend you're an airplane for 3 minutes",
       "category": "hard",
       "basePoints": 20,
-      "requirements": ["Must be at an airport", "Must be 3 full minutes", "Video required"]
+      "requirements": []
     },
     {
       "id": "hard-007",
@@ -56,7 +56,7 @@ window.CHALLENGES_HARD = {
       "category": "hard",
       "basePoints": 13,
       "bonusPoints": {"criteria": "Most money made", "points": 7},
-      "requirements": ["Must actually make money", "Photo of earnings", "Video of selling"]
+      "requirements": []
     },
     {
       "id": "hard-008",
@@ -64,7 +64,7 @@ window.CHALLENGES_HARD = {
       "description": "Create and perform a secret handshake with a stranger",
       "category": "hard",
       "basePoints": 10,
-      "requirements": ["Must be a stranger", "Must create unique handshake", "Video required"]
+      "requirements": []
     },
     {
       "id": "hard-009",
@@ -72,7 +72,7 @@ window.CHALLENGES_HARD = {
       "description": "Build a sandcastle at a NYC beach",
       "category": "hard",
       "basePoints": 12,
-      "requirements": ["Must be at a NYC beach", "Photo of completed sandcastle"]
+      "requirements": []
     },
     {
       "id": "hard-010",
@@ -80,7 +80,7 @@ window.CHALLENGES_HARD = {
       "description": "Get selfies with 4 different people wearing 4 different NY major sports teams gear",
       "category": "hard",
       "basePoints": 12,
-      "requirements": ["Must be 4 different teams", "Must be 4 different people", "All must be NY teams"]
+      "requirements": []
     },
     {
       "id": "hard-011",
@@ -88,7 +88,7 @@ window.CHALLENGES_HARD = {
       "description": "Go to a farmers market and act like a farmer",
       "category": "hard",
       "basePoints": 8,
-      "requirements": ["Must be at a farmers market", "Video evidence", "Must stay in character"]
+      "requirements": ["Must stay in character"]
     },
     {
       "id": "hard-012",
@@ -96,7 +96,7 @@ window.CHALLENGES_HARD = {
       "description": "Visit and stand on 5 different islands in NYC",
       "category": "hard",
       "basePoints": 20,
-      "requirements": ["Must be 5 different islands", "Photo on each island with proof"]
+      "requirements": []
     },
     {
       "id": "hard-013",
@@ -104,7 +104,7 @@ window.CHALLENGES_HARD = {
       "description": "Visit both terminal stations of the same subway line at some point in the day",
       "category": "hard",
       "basePoints": 10,
-      "requirements": ["Must be same subway line", "Photo at both terminals", "Must be same day"]
+      "requirements": []
     }
   ]
 };

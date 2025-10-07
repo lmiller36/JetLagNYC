@@ -7,7 +7,7 @@ window.CHALLENGES_EASY = {
       "description": "Pet 5 different dogs around the city",
       "category": "easy",
       "basePoints": 3,
-      "requirements": ["Must pet 5 different dogs", "Get owner permission"]
+      "requirements": []
     },
     {
       "id": "easy-002",
@@ -15,7 +15,7 @@ window.CHALLENGES_EASY = {
       "description": "Walk across any bridge in NYC",
       "category": "easy",
       "basePoints": 4,
-      "requirements": ["Must walk the full length", "Photo evidence required"]
+      "requirements": []
     },
     {
       "id": "easy-003",
@@ -23,7 +23,7 @@ window.CHALLENGES_EASY = {
       "description": "Find someone reading and ask them what they like about their book",
       "category": "easy",
       "basePoints": 4,
-      "requirements": ["Must be reading a physical book", "Record the conversation"]
+      "requirements": []
     },
     {
       "id": "easy-004",
@@ -31,7 +31,7 @@ window.CHALLENGES_EASY = {
       "description": "Ask someone on the subway, bus, ferry, etc how their day is going",
       "category": "easy",
       "basePoints": 3,
-      "requirements": ["Must be on public transit", "Get their response"]
+      "requirements": ["Must be on public transit"]
     },
     {
       "id": "easy-005",
@@ -39,7 +39,7 @@ window.CHALLENGES_EASY = {
       "description": "Find and try on the wackiest piece of clothing in a store",
       "category": "easy",
       "basePoints": 4,
-      "requirements": ["Must try it on", "Photo evidence required"]
+      "requirements": []
     },
     {
       "id": "easy-006",
@@ -48,7 +48,7 @@ window.CHALLENGES_EASY = {
       "category": "easy",
       "basePoints": 4,
       "bonusPoints": {"criteria": "If you know all the words", "points": 1},
-      "requirements": ["Must be a real flag", "Video evidence required"]
+      "requirements": []
     },
     {
       "id": "easy-007",
@@ -56,7 +56,7 @@ window.CHALLENGES_EASY = {
       "description": "Find an American flag in NYC and recite the pledge of allegiance",
       "category": "easy",
       "basePoints": 3,
-      "requirements": ["Must be in front of a real flag", "Video evidence required"]
+      "requirements": []
     },
     {
       "id": "easy-008",
@@ -64,7 +64,7 @@ window.CHALLENGES_EASY = {
       "description": "Yell the famous NYC phrase through 10 different intersections",
       "category": "easy",
       "basePoints": 6,
-      "requirements": ["Must be 10 different intersections", "Video evidence required"]
+      "requirements": []
     },
     {
       "id": "easy-009",
@@ -72,7 +72,7 @@ window.CHALLENGES_EASY = {
       "description": "Find and photograph license plates from 10 different states (including DC, Canadian provinces, other countries)",
       "category": "easy",
       "basePoints": 7,
-      "requirements": ["Must be 10 different states/provinces/countries", "All plates must be clearly visible"]
+      "requirements": []
     },
     {
       "id": "easy-010",
@@ -80,7 +80,7 @@ window.CHALLENGES_EASY = {
       "description": "Give 10 critiques of New Jersey while having a view of NJ from NYC",
       "category": "easy",
       "basePoints": 4,
-      "requirements": ["Must have NJ visible in background", "Share video with group"]
+      "requirements": ["Must have NJ visible in background"]
     },
     {
       "id": "easy-011",
@@ -89,7 +89,7 @@ window.CHALLENGES_EASY = {
       "category": "easy",
       "basePoints": 5,
       "bonusPoints": {"criteria": "Fattest rat of the day", "points": 3},
-      "requirements": ["Must be a real rat", "Photo must be clear"]
+      "requirements": []
     },
     {
       "id": "easy-012",
@@ -97,7 +97,7 @@ window.CHALLENGES_EASY = {
       "description": "Get 3 different snacks or drinks that originate from places outside of US/Canada",
       "category": "easy",
       "basePoints": 5,
-      "requirements": ["Must be 3 different items", "Must show country of origin"]
+      "requirements": []
     },
     {
       "id": "easy-013",
@@ -105,7 +105,7 @@ window.CHALLENGES_EASY = {
       "description": "Do 100 of any exercise together as a team in an outdoor exercise park",
       "category": "easy",
       "basePoints": 6,
-      "requirements": ["Must be in an outdoor exercise park", "All team members participate", "Video evidence"]
+      "requirements": ["All team members participate!"]
     },
     {
       "id": "easy-014",
@@ -113,7 +113,7 @@ window.CHALLENGES_EASY = {
       "description": "Find a coffee shop that uses beans roasted in the city and treat yourself to something",
       "category": "easy",
       "basePoints": 4,
-      "requirements": ["Must verify beans are roasted in NYC", "Photo of coffee and shop"]
+      "requirements": ["Please share with Lorne...he's obsessed with caffeine and used you for crowdsourcing!"]
     },
     {
       "id": "easy-015",
@@ -122,7 +122,7 @@ window.CHALLENGES_EASY = {
       "category": "easy",
       "basePoints": 8,
       "bonusPoints": {"criteria": "Highest of the day", "points": 5},
-      "requirements": ["Must verify floor number", "Photo evidence with view"]
+      "requirements": []
     },
     {
       "id": "easy-016",
@@ -130,7 +130,7 @@ window.CHALLENGES_EASY = {
       "description": "Learn the name of a bus driver, conductor, or MTA employee",
       "category": "easy",
       "basePoints": 3,
-      "requirements": ["Must get their actual name", "Photo or video evidence"]
+      "requirements": []
     },
     {
       "id": "easy-017",
@@ -138,7 +138,7 @@ window.CHALLENGES_EASY = {
       "description": "Find a photo of NYC from 50+ years ago and recreate it",
       "category": "easy",
       "basePoints": 4,
-      "requirements": ["Original photo must be 50+ years old", "Side-by-side comparison required"]
+      "requirements": ["Side-by-side comparison shot required!"]
     },
     {
       "id": "easy-018",
@@ -146,7 +146,7 @@ window.CHALLENGES_EASY = {
       "description": "Jump in a fountain while playing the Friends theme song",
       "category": "easy",
       "basePoints": 7,
-      "requirements": ["Must actually jump in fountain", "Friends theme must be audible", "Video required"]
+      "requirements": []
     },
     {
       "id": "easy-019",
@@ -154,7 +154,7 @@ window.CHALLENGES_EASY = {
       "description": "Go to a Michelin starred restaurant and ask about the meal of the day. Get a picture of the menu too!",
       "category": "easy",
       "basePoints": 5,
-      "requirements": ["Must be Michelin starred", "Photo of menu required", "Record the interaction"]
+      "requirements": []
     }
   ]
 };

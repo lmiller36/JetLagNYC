@@ -9,7 +9,7 @@ window.CHALLENGES_LOCATION = {
       "basePoints": 5,
       "bonusPoints": {"criteria": "Hottest princess", "points": 3},
       "locationRestriction": {"type": "neighborhood", "value": "times-square"},
-      "requirements": ["Must be in Times Square", "Person must be in costume"]
+      "requirements": []
     },
     {
       "id": "location-002",
@@ -18,7 +18,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "high-line"},
-      "requirements": ["Must be on the High Line", "Video evidence", "Stay in character"]
+      "requirements": ["Stay in character!"]
     },
     {
       "id": "location-003",
@@ -27,7 +27,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 7,
       "locationRestriction": {"type": "neighborhood", "value": "grand-central"},
-      "requirements": ["Must be at the whispering gallery", "Video evidence"]
+      "requirements": []
     },
     {
       "id": "location-004",
@@ -36,7 +36,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "roosevelt-island"},
-      "requirements": ["Must ride the tram", "Photo from inside tram"]
+      "requirements": []
     },
     {
       "id": "location-005",
@@ -45,7 +45,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 11,
       "locationRestriction": {"type": "neighborhood", "value": "dumbo"},
-      "requirements": ["Must be in DUMBO", "Team must sit and listen", "Video required"]
+      "requirements": ["Team must sit and listen like 3 year olds."]
     },
     {
       "id": "location-006",
@@ -54,7 +54,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "dumbo"},
-      "requirements": ["Must be at Time Out Market", "Group photo on roof"]
+      "requirements": []
     },
     {
       "id": "location-007",
@@ -63,7 +63,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 8,
       "locationRestriction": {"type": "neighborhood", "value": "statue-of-liberty"},
-      "requirements": ["Statue of Liberty must be visible", "At least 10 reasons", "Video required"]
+      "requirements": ["Statue of Liberty must be visible"]
     },
     {
       "id": "location-008",
@@ -72,7 +72,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 15,
       "locationRestriction": {"type": "neighborhood", "value": "red-hook"},
-      "requirements": ["Must be at IKEA Red Hook", "Must build something", "Photo of creation"]
+      "requirements": []
     },
     {
       "id": "location-009",
@@ -82,17 +82,17 @@ window.CHALLENGES_LOCATION = {
       "basePoints": 10,
       "bonusPoints": {"criteria": "Most convincing proposal", "points": 5},
       "locationRestriction": {"type": "neighborhood", "value": "manhattan"},
-      "requirements": ["Empire State Building must be visible", "Video required", "Must look convincing"]
+      "requirements": ["Empire State Building must be visible"]
     },
     {
       "id": "location-010",
       "title": "Prospect in Prospect Park",
       "description": "Pick up 10 pieces of trash as a team in Prospect Park (best pile of gold wins). You can do this in any park for 6 points, Prospect Park gets 10",
       "category": "location-specific",
-      "basePoints": 10,
+      "basePoints": 6,
       "bonusPoints": {"criteria": "Best pile of trash/gold", "points": 5},
       "locationRestriction": {"type": "neighborhood", "value": "prospect-park"},
-      "requirements": ["Pick up 10 pieces of trash", "Photo of collected trash", "Any park: 6 points, Prospect Park: 10 points"]
+      "requirements": ["Any park: 6 points, Prospect Park: 10 points -> TODO!"]
     },
     {
       "id": "location-011",
@@ -101,7 +101,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 5,
       "locationRestriction": {"type": "neighborhood", "value": "wall-street"},
-      "requirements": ["Must be on Wall Street", "Photo of climbing", "Be safe!"]
+      "requirements": ["Be safe!"]
     },
     {
       "id": "location-012",
@@ -110,7 +110,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 10,
       "locationRestriction": {"type": "neighborhood", "value": "crown-heights"},
-      "requirements": ["Must be in Crown Heights", "Parade around full block", "Video required", "Share with group"]
+      "requirements": ["Parade around full block"]
     },
     {
       "id": "location-013",
@@ -119,7 +119,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 8,
       "locationRestriction": {"type": "neighborhood", "value": "flushing"},
-      "requirements": ["Must be in Flushing", "5 different store workers", "Video evidence"]
+      "requirements": []
     },
     {
       "id": "location-014",
@@ -128,7 +128,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 8,
       "locationRestriction": {"type": "neighborhood", "value": "hunters-point"},
-      "requirements": ["Must be in Hunters Point", "Must be real wildlife", "Clear photo"]
+      "requirements": []
     },
     {
       "id": "location-015",
@@ -137,7 +137,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 9,
       "locationRestriction": {"type": "neighborhood", "value": "bushwick-flatbush"},
-      "requirements": ["Must be in Bushwick or Flatbush", "1 minute video case", "Show the bush"]
+      "requirements": []
     },
     {
       "id": "location-016",
@@ -146,7 +146,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "greenpoint"},
-      "requirements": ["Must be in Greenpoint", "10 different plant species", "Photo of each with identification"]
+      "requirements": []
     },
     {
       "id": "location-017",
@@ -155,7 +155,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "chinatown"},
-      "requirements": ["Must be in a Chinatown", "Photo of dumpling", "Photo of restaurant"]
+      "requirements": []
     },
     {
       "id": "location-018",
@@ -164,7 +164,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 7,
       "locationRestriction": {"type": "neighborhood", "value": "forest-hills"},
-      "requirements": ["Must be in Forest Park", "Video of Forrest Gump impression", "Stay in character"]
+      "requirements": ["Stay in character", "Get at least 3 movie quotes on camera"]
     },
     {
       "id": "location-019",
@@ -173,7 +173,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "bushwick"},
-      "requirements": ["Must be at Bushwick Collective", "Photo of street art"]
+      "requirements": []
     },
     {
       "id": "location-020",
@@ -182,7 +182,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 4,
       "locationRestriction": {"type": "neighborhood", "value": "14th-8th-station"},
-      "requirements": ["Must be in 14th/8th St station", "Photo with statue"]
+      "requirements": []
     },
     {
       "id": "location-021",
@@ -191,7 +191,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "williamsburg"},
-      "requirements": ["Must be at the Mosaic House", "Photo of the house"]
+      "requirements": []
     },
     {
       "id": "location-022",
@@ -200,7 +200,7 @@ window.CHALLENGES_LOCATION = {
       "category": "location-specific",
       "basePoints": 6,
       "locationRestriction": {"type": "neighborhood", "value": "astoria"},
-      "requirements": ["Must be at Socrates Sculpture Park", "Photo of sculptures"]
+      "requirements": []
     }
   ]
 };
