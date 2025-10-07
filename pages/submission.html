@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Submit your scavenger hunt photos - Upload evidence of completed challenges">
+    <title>Submit Photos - NYC Scavenger Hunt</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        /* Submission page specific styles */
+        .submission-hero {
+            background: linear-gradient(135deg, var(--success-color), #1e7e34);
+            color: var(--white);
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+        }
+
+        .submission-hero h2 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .submission-hero p {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .submission-content {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .submission-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .drive-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: var(--white);
+            padding: var(--spacing-lg) var(--spacing-2xl);
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-size: var(--font-size-lg);
+            font-weight: bold;
+            min-height: var(--touch-target);
+            transition: var(--transition);
+            margin: var(--spacing-lg) 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .drive-link:hover,
+        .drive-link:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .drive-link::before {
+            content: "📁 ";
+            margin-right: var(--spacing-sm);
+        }
+
+        .instructions-section {
+            background-color: var(--light-color);
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .instructions-grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            grid-template-columns: 1fr;
+        }
+
+        .instruction-card {
+            background-color: var(--white);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .instruction-card h3 {
+            color: var(--primary-color);
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .instruction-card ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .instruction-card li {
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .instruction-card li:last-child {
+            border-bottom: none;
+        }
+
+        .instruction-card li::before {
+            content: "✓ ";
+            color: var(--success-color);
+            font-weight: bold;
+            margin-right: var(--spacing-sm);
+        }
+
+        .alert {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .alert-icon {
+            font-size: var(--font-size-lg);
+            margin-right: var(--spacing-sm);
+        }
+
+        .fallback-section {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            margin-top: var(--spacing-xl);
+        }
+
+        .fallback-section h4 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .instructions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .submission-hero h2 {
+                font-size: var(--font-size-4xl);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .instructions-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-container">
+                <h1 class="logo">
+                    <a href="../index.html" style="color: inherit; text-decoration: none;">NYC Scavenger Hunt</a>
+                </h1>
+                <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                    <span class="hamburger"></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="../index.html" class="nav-link">Home</a></li>
+                    <li><a href="challenges.html" class="nav-link">Challenges</a></li>
+                    <li><a href="neighborhoods.html" class="nav-link">Neighborhoods</a></li>
+                    <li><a href="submission.html" class="nav-link active">Submit Photos</a></li>
+                    <li><a href="rules.html" class="nav-link">Rules</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="submission-hero">
+            <div class="container">
+                <h2>Submit Your Photos</h2>
+                <p>Upload evidence of your completed challenges to earn points. Make sure your photos clearly show the challenge completion!</p>
+            </div>
+        </section>
+
+        <section class="submission-content">
+            <div class="container">
+                <div class="submission-card">
+                    <h3>Upload to Google Drive</h3>
+                    <p>Click the button below to access our shared Google Drive folder where you can upload your challenge photos.</p>
+                    
+                    <a href="https://drive.google.com/drive/folders/example-folder-id" 
+                       class="drive-link" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       aria-label="Open Google Drive folder in new tab">
+                        Upload Photos to Google Drive
+                    </a>
+                    
+                    <div class="alert">
+                        <span class="alert-icon">⚠️</span>
+                        <strong>Important:</strong> Make sure you're signed into your Google account before clicking the link above.
+                    </div>
+                </div>
+
+                <div class="fallback-section">
+                    <h4>🚨 Can't Access Google Drive?</h4>
+                    <p>If you're having trouble accessing the Google Drive folder, try these solutions:</p>
+                    <ul>
+                        <li>Make sure you're signed into your Google account</li>
+                        <li>Check if you have permission to access the folder</li>
+                        <li>Try opening the link in an incognito/private browser window</li>
+                        <li>Contact the game organizers for alternative submission methods</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="instructions-section">
+            <div class="container">
+                <h3 class="text-center mb-xl">Photo Submission Guidelines</h3>
+                
+                <div class="instructions-grid">
+                    <div class="instruction-card">
+                        <h3>📸 Photo Requirements</h3>
+                        <ul>
+                            <li>Photos must be clear and well-lit</li>
+                            <li>Include yourself or team member in the photo</li>
+                            <li>Show the challenge location or activity clearly</li>
+                            <li>Take photos in landscape orientation when possible</li>
+                            <li>Ensure photos are not blurry or too dark</li>
+                        </ul>
+                    </div>
+
+                    <div class="instruction-card">
+                        <h3>📝 File Naming</h3>
+                        <ul>
+                            <li>Name files: "TeamName_ChallengeName_Location"</li>
+                            <li>Example: "TeamAwesome_EatPizza_LittleItaly"</li>
+                            <li>Use underscores instead of spaces</li>
+                            <li>Keep file names under 50 characters</li>
+                            <li>Include timestamp if multiple attempts</li>
+                        </ul>
+                    </div>
+
+                    <div class="instruction-card">
+                        <h3>📋 What to Include</h3>
+                        <ul>
+                            <li>Team name in the file name</li>
+                            <li>Challenge being completed</li>
+                            <li>Neighborhood or specific location</li>
+                            <li>Timestamp (camera metadata is fine)</li>
+                            <li>Any bonus criteria being attempted</li>
+                        </ul>
+                    </div>
+
+                    <div class="instruction-card">
+                        <h3>⏰ Submission Timing</h3>
+                        <ul>
+                            <li>Submit photos as soon as possible after completion</li>
+                            <li>Photos must be taken during the game period</li>
+                            <li>Late submissions may not be counted</li>
+                            <li>Check with organizers for deadline extensions</li>
+                            <li>Batch upload is acceptable at end of day</li>
+                        </ul>
+                    </div>
+
+                    <div class="instruction-card">
+                        <h3>✅ Valid Evidence</h3>
+                        <ul>
+                            <li>Photo clearly shows challenge completion</li>
+                            <li>Team member visible in the photo</li>
+                            <li>Location is identifiable</li>
+                            <li>Photo taken during game timeframe</li>
+                            <li>Meets specific challenge requirements</li>
+                        </ul>
+                    </div>
+
+                    <div class="instruction-card">
+                        <h3>🚫 Invalid Submissions</h3>
+                        <ul>
+                            <li>Blurry or unclear photos</li>
+                            <li>Photos without team members</li>
+                            <li>Screenshots or downloaded images</li>
+                            <li>Photos taken before/after game period</li>
+                            <li>Staged or fake challenge completions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025....Not actually...but wouldn't that be cool?</p>
+        </div>
+    </footer>
+
+    <script src="../js/nav.js"></script>
+</body>
+</html>

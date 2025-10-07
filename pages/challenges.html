@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NYC Scavenger Hunt Challenges - View all available challenges and their point values">
+    <title>Challenges - NYC Scavenger Hunt</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/challenges.css">
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-container">
+                <h1 class="logo">
+                    <a href="../index.html" style="color: inherit; text-decoration: none;">NYC Scavenger Hunt</a>
+                </h1>
+                <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                    <span class="hamburger"></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="../index.html" class="nav-link">Home</a></li>
+                    <li><a href="challenges.html" class="nav-link active">Challenges</a></li>
+                    <li><a href="neighborhoods.html" class="nav-link">Neighborhoods</a></li>
+                    <li><a href="submission.html" class="nav-link">Submit Photos</a></li>
+                    <li><a href="rules.html" class="nav-link">Rules</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h2>Scavenger Hunt Challenges</h2>
+                <p>Complete these challenges across NYC to earn points. Each challenge has specific requirements and some offer bonus points!</p>
+            </div>
+        </section>
+
+        <section class="challenges-section">
+            <div class="container">
+                <!-- Search and Filter Controls -->
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" id="challenge-search" placeholder="Search challenges..." aria-label="Search challenges">
+                    </div>
+                    
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="category-filter">Category:</label>
+                            <select id="category-filter" aria-label="Filter by category">
+                                <option value="all">All Categories</option>
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                                <option value="location-specific">Location-Specific</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="points-sort">Sort by Points:</label>
+                            <select id="points-sort" aria-label="Sort by points">
+                                <option value="default">Default Order</option>
+                                <option value="points-asc">Points: Low to High</option>
+                                <option value="points-desc">Points: High to Low</option>
+                            </select>
+                        </div>
+                        
+                        <button id="clear-filters" class="btn btn-secondary">Clear Filters</button>
+                    </div>
+                </div>
+
+                <!-- Results Summary -->
+                <div class="results-summary">
+                    <p id="results-count">Loading challenges...</p>
+                </div>
+
+                <!-- Challenges Grid -->
+                <div class="challenges-grid" id="challenges-container">
+                    <!-- Challenges will be loaded here by JavaScript -->
+                </div>
+
+                <!-- No Results Message -->
+                <div class="no-results" id="no-results" style="display: none;">
+                    <h3>No challenges found</h3>
+                    <p>Try adjusting your search terms or filters to find more challenges.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025....Not actually...but wouldn't that be cool?</p>
+        </div>
+    </footer>
+
+    <!-- Embedded challenge data for file:// protocol compatibility -->
+    <script src="../js/data/challenges-easy-embedded.js"></script>
+    <script src="../js/data/challenges-medium-embedded.js"></script>
+    <script src="../js/data/challenges-hard-embedded.js"></script>
+    <script src="../js/data/challenges-location-embedded.js"></script>
+    
+    <script src="../js/nav.js"></script>
+    <script src="../js/challenges.js"></script>
+</body>
+</html>

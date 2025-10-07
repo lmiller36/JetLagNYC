@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="NYC Scavenger Hunt Neighborhoods - View point values for different NYC neighborhoods">
+    <title>Neighborhoods - NYC Scavenger Hunt</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/neighborhoods.css">
+</head>
+
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-container">
+                <h1 class="logo">
+                    <a href="../index.html" style="color: inherit; text-decoration: none;">NYC Scavenger Hunt</a>
+                </h1>
+                <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                    <span class="hamburger"></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="../index.html" class="nav-link">Home</a></li>
+                    <li><a href="challenges.html" class="nav-link">Challenges</a></li>
+                    <li><a href="neighborhoods.html" class="nav-link active">Neighborhoods</a></li>
+                    <li><a href="submission.html" class="nav-link">Submit Photos</a></li>
+                    <li><a href="rules.html" class="nav-link">Rules</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h2>NYC Neighborhood Scoring</h2>
+                <p>Explore different neighborhoods across NYC's five boroughs. Point values increase with distance from
+                    Midtown Manhattan!</p>
+            </div>
+        </section>
+
+        <section class="scoring-explanation">
+            <div class="container">
+                <div class="scoring-info">
+                    <h3>How Neighborhood Scoring Works</h3>
+                    <p class="scoring-description">Complete at least one challenge in a neighborhood below to score
+                        bonus points!</p>
+
+                    <div class="legend-and-table-container">
+                        <div class="map-legend">
+                            <h4>Map Legend</h4>
+                            <div class="legend-items">
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background-color: #89B8D9;"></span>
+                                    <span class="legend-label">8 points</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background-color: #F7B27A;"></span>
+                                    <span class="legend-label">12 points</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background-color: #52A447;"></span>
+                                    <span class="legend-label">16 points</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background-color: #9B59B6;"></span>
+                                    <span class="legend-label">20 points</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background-color: #FF6B6B;"></span>
+                                    <span class="legend-label">24 points</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color legend-white"></span>
+                                    <span class="legend-label">In bounds, no bonus</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color legend-candy-cane"></span>
+                                    <span class="legend-label">Out of bounds</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="neighborhoods-table">
+                            <h4>Neighborhood Bonus Points</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Borough</th>
+                                        <th>Neighborhood</th>
+                                        <th>Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="4" class="borough-cell">Manhattan</td>
+                                        <td>Below Central Park</td>
+                                        <td>No bonus</td>
+                                    </tr>
+                                    <tr>
+                                        <td>UWS</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>UES</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>North of Central Park</td>
+                                        <td>12</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="5" class="borough-cell">Queens</td>
+                                        <td>LIC/Hunters Point</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Astoria</td>
+                                        <td>12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jackson Heights</td>
+                                        <td>16</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Flushing</td>
+                                        <td>24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Forest Hills</td>
+                                        <td>20</td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="11" class="borough-cell">Brooklyn</td>
+                                        <td>Dumbo</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Williamsburg / Greenpoint</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gowanus</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Park Slope</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sunset Park</td>
+                                        <td>20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Red Hook</td>
+                                        <td>12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Coney Island</td>
+                                        <td>20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Crown Heights</td>
+                                        <td>20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bushwick</td>
+                                        <td>20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Flatbush</td>
+                                        <td>24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Brighton Beach</td>
+                                        <td>20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="points-values-image">
+                        <img src="../NYC Scavenger Hunt Points Values.png" alt="NYC Scavenger Hunt Points Values" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="neighborhoods-section">
+            <div class="container">
+                <!-- <div class="borough-filter">
+                    <h3>Filter by Borough</h3>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-borough="all">All Boroughs</button>
+                        <button class="filter-btn" data-borough="manhattan">Manhattan</button>
+                        <button class="filter-btn" data-borough="queens">Queens</button>
+                        <button class="filter-btn" data-borough="brooklyn">Brooklyn</button>
+                        <button class="filter-btn" data-borough="bronx">Bronx</button>
+                        <button class="filter-btn" data-borough="staten-island">Staten Island</button>
+                    </div>
+                </div> -->
+
+                <div class="neighborhoods-container" id="neighborhoods-container">
+                    <!-- Neighborhoods will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025....Not actually...but wouldn't that be cool?</p>
+        </div>
+    </footer>
+
+    <script src="../js/nav.js"></script>
+    <script src="../js/neighborhoods.js"></script>
+</body>
+
+</html>

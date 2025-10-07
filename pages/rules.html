@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NYC Scavenger Hunt Rules - Learn how to play and score points in our city-wide game">
+    <title>Game Rules - NYC Scavenger Hunt</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        /* Rules page specific styles */
+        .rules-hero {
+            background: linear-gradient(135deg, var(--warning-color), #e0a800);
+            color: var(--dark-color);
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+        }
+
+        .rules-hero h2 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .rules-hero p {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .rules-content {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .rules-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .rules-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .rules-card h3 {
+            color: var(--primary-color);
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        .rules-card h4 {
+            color: var(--secondary-color);
+            font-size: var(--font-size-lg);
+            margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+        }
+
+        .rules-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rules-list li {
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: var(--spacing-xl);
+        }
+
+        .rules-list li:last-child {
+            border-bottom: none;
+        }
+
+        .rules-list li::before {
+            content: "📋";
+            position: absolute;
+            left: 0;
+            top: var(--spacing-sm);
+        }
+
+        .scoring-grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            grid-template-columns: 1fr;
+            margin: var(--spacing-lg) 0;
+        }
+
+        .scoring-card {
+            background: linear-gradient(135deg, var(--light-color), #e9ecef);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .scoring-card h4 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .points-display {
+            font-size: var(--font-size-2xl);
+            font-weight: bold;
+            color: var(--success-color);
+            margin: var(--spacing-sm) 0;
+        }
+
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .example-box h5 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius);
+            border: 1px solid #ffeaa7;
+            margin: var(--spacing-md) 0;
+        }
+
+        .challenge-categories {
+            display: grid;
+            gap: var(--spacing-md);
+            grid-template-columns: 1fr;
+            margin: var(--spacing-lg) 0;
+        }
+
+        .category-card {
+            background-color: var(--white);
+            border: 2px solid;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+
+        .category-general {
+            border-color: var(--success-color);
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        .category-medium {
+            border-color: var(--warning-color);
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        }
+
+        .category-hard {
+            border-color: var(--danger-color);
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        }
+
+        .category-location {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+        }
+
+        .toc {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .toc h3 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            padding: var(--spacing-xs) 0;
+        }
+
+        .toc a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .scoring-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .challenge-categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .rules-hero h2 {
+                font-size: var(--font-size-4xl);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .challenge-categories {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-container">
+                <h1 class="logo">
+                    <a href="../index.html" style="color: inherit; text-decoration: none;">NYC Scavenger Hunt</a>
+                </h1>
+                <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                    <span class="hamburger"></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="../index.html" class="nav-link">Home</a></li>
+                    <li><a href="challenges.html" class="nav-link">Challenges</a></li>
+                    <li><a href="neighborhoods.html" class="nav-link">Neighborhoods</a></li>
+                    <li><a href="submission.html" class="nav-link">Submit Photos</a></li>
+                    <li><a href="rules.html" class="nav-link active">Rules</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="rules-hero">
+            <div class="container">
+                <h2>Game Rules & Instructions</h2>
+                <p>Everything you need to know to play the NYC Scavenger Hunt. Read carefully to maximize your points!</p>
+            </div>
+        </section>
+
+        <section class="rules-content">
+            <div class="container">
+                <!-- Table of Contents -->
+                <div class="toc">
+                    <h3>📖 Quick Navigation</h3>
+                    <ul>
+                        <li><a href="#game-overview">Game Overview</a></li>
+                        <li><a href="#scoring-system">Scoring System</a></li>
+                        <li><a href="#challenge-types">Challenge Types</a></li>
+                        <li><a href="#photo-evidence">Photo Evidence Rules</a></li>
+                        <li><a href="#bonus-points">Bonus Points</a></li>
+                        <li><a href="#gameplay-rules">Gameplay Rules</a></li>
+                        <li><a href="#winning">How to Win</a></li>
+                    </ul>
+                </div>
+
+                <!-- Game Overview -->
+                <div class="rules-section" id="game-overview">
+                    <div class="rules-card">
+                        <h3>🎯 Game Overview</h3>
+                        <p>The NYC Scavenger Hunt is a competitive game inspired by "Jet Lag the Game" where teams race across New York City's five boroughs to complete challenges and earn points. Teams must strategically choose which neighborhoods to visit and which challenges to complete to maximize their score.</p>
+                        
+                        <h4>Basic Concept</h4>
+                        <ul class="rules-list">
+                            <li>Teams compete across Manhattan, Queens, Brooklyn, Bronx, and Staten Island</li>
+                            <li>Complete challenges in different neighborhoods to earn points</li>
+                            <li>Submit photo evidence of challenge completion</li>
+                            <li>Strategic planning is key - some areas offer more points but are harder to reach</li>
+                            <li>Game has a set time limit (determined by organizers)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Scoring System -->
+                <div class="rules-section" id="scoring-system">
+                    <div class="rules-card">
+                        <h3>🏆 Scoring System</h3>
+                        <p>Your total score is calculated by combining neighborhood points with challenge points. Understanding this system is crucial for strategic gameplay.</p>
+                        
+                        <div class="scoring-grid">
+                            <div class="scoring-card">
+                                <h4>Neighborhood Points</h4>
+                                <div class="points-display">Base × 4</div>
+                                <p>Each neighborhood has a base point value that gets multiplied by 4. Areas farther from Midtown Manhattan offer higher base points.</p>
+                            </div>
+                            
+                            <div class="scoring-card">
+                                <h4>Challenge Points</h4>
+                                <div class="points-display">Varies</div>
+                                <p>Each challenge has its own point value based on difficulty. Some challenges offer bonus points for extra criteria.</p>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h5>📊 Scoring Example</h5>
+                            <p><strong>Scenario:</strong> Complete a "Take a selfie with street art" challenge (15 points) in Williamsburg, Brooklyn (base: 8 points)</p>
+                            <p><strong>Calculation:</strong></p>
+                            <ul>
+                                <li>Neighborhood points: 8 × 4 = 32 points</li>
+                                <li>Challenge points: 15 points</li>
+                                <li><strong>Total: 47 points</strong></li>
+                            </ul>
+                        </div>
+
+                        <div class="highlight">
+                            <strong>💡 Strategy Tip:</strong> Higher-point neighborhoods are typically farther from Midtown Manhattan, so plan your route carefully to balance travel time with point potential.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Challenge Types -->
+                <div class="rules-section" id="challenge-types">
+                    <div class="rules-card">
+                        <h3>🎮 Challenge Categories</h3>
+                        <p>Challenges are organized into four categories, each with different difficulty levels and requirements.</p>
+                        
+                        <div class="challenge-categories">
+                            <div class="category-card category-general">
+                                <h4>General</h4>
+                                <p>Can be completed anywhere in NYC. Usually easier and worth fewer points.</p>
+                            </div>
+                            
+                            <div class="category-card category-medium">
+                                <h4>Medium</h4>
+                                <p>Moderate difficulty challenges that may require specific types of locations.</p>
+                            </div>
+                            
+                            <div class="category-card category-hard">
+                                <h4>Hard</h4>
+                                <p>Difficult challenges requiring more effort, creativity, or specific skills.</p>
+                            </div>
+                            
+                            <div class="category-card category-location">
+                                <h4>Location-Specific</h4>
+                                <p>Must be completed in specific neighborhoods or at particular landmarks.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Evidence Rules -->
+                <div class="rules-section" id="photo-evidence">
+                    <div class="rules-card">
+                        <h3>📸 Valid Photo Evidence</h3>
+                        <p>Photo evidence is crucial for scoring. Follow these rules to ensure your submissions are accepted.</p>
+                        
+                        <h4>✅ Required Elements</h4>
+                        <ul class="rules-list">
+                            <li>At least one team member must be visible in the photo</li>
+                            <li>The challenge activity or location must be clearly shown</li>
+                            <li>Photo must be taken during the official game timeframe</li>
+                            <li>Image must be clear, well-lit, and not blurry</li>
+                            <li>Location must be identifiable (street signs, landmarks, etc.)</li>
+                        </ul>
+
+                        <h4>❌ Invalid Evidence</h4>
+                        <ul class="rules-list">
+                            <li>Screenshots or downloaded images from the internet</li>
+                            <li>Photos without any team members visible</li>
+                            <li>Blurry, dark, or unclear images</li>
+                            <li>Photos taken before or after the game period</li>
+                            <li>Staged or fake challenge completions</li>
+                            <li>Photos that don't clearly show the challenge being completed</li>
+                        </ul>
+
+                        <div class="example-box">
+                            <h5>📷 Good Photo Example</h5>
+                            <p><strong>Challenge:</strong> "Eat a slice of pizza from a local pizzeria"</p>
+                            <p><strong>Good photo shows:</strong> Team member holding/eating pizza slice, pizzeria name visible in background, clear image taken during game time.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bonus Points -->
+                <div class="rules-section" id="bonus-points">
+                    <div class="rules-card">
+                        <h3>⭐ Bonus Points System</h3>
+                        <p>Many challenges offer bonus points for going above and beyond the basic requirements.</p>
+                        
+                        <h4>How Bonus Points Work</h4>
+                        <ul class="rules-list">
+                            <li>Bonus criteria are listed with each eligible challenge</li>
+                            <li>You must complete the base challenge AND the bonus requirement</li>
+                            <li>Bonus points are added to the base challenge points</li>
+                            <li>Multiple bonus criteria can sometimes be combined</li>
+                            <li>Bonus attempts must be clearly documented in photos</li>
+                        </ul>
+
+                        <div class="example-box">
+                            <h5>🌟 Bonus Example</h5>
+                            <p><strong>Base Challenge:</strong> "Take a photo with a street performer" (10 points)</p>
+                            <p><strong>Bonus:</strong> "Give the performer a tip" (+5 points)</p>
+                            <p><strong>Total if bonus completed:</strong> 15 points + neighborhood points</p>
+                        </div>
+
+                        <div class="highlight">
+                            <strong>💰 Bonus Strategy:</strong> Bonus points can significantly increase your score, but they often require extra time or money. Plan accordingly!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gameplay Rules -->
+                <div class="rules-section" id="gameplay-rules">
+                    <div class="rules-card">
+                        <h3>⚖️ Gameplay Rules</h3>
+                        
+                        <h4>Team Rules</h4>
+                        <ul class="rules-list">
+                            <li>Teams can have 2-4 members (check with organizers for specific limits)</li>
+                            <li>All team members must stay together during challenges</li>
+                            <li>Teams cannot split up to complete multiple challenges simultaneously</li>
+                            <li>Each team gets one submission per challenge</li>
+                        </ul>
+
+                        <h4>Transportation & Movement</h4>
+                        <ul class="rules-list">
+                            <li>Use any legal form of transportation (subway, bus, taxi, walking, etc.)</li>
+                            <li>Follow all traffic laws and safety regulations</li>
+                            <li>Respect private property and "No Trespassing" signs</li>
+                            <li>Be courteous to NYC residents and businesses</li>
+                        </ul>
+
+                        <h4>Challenge Completion</h4>
+                        <ul class="rules-list">
+                            <li>Each challenge can only be completed once per team</li>
+                            <li>Challenges must be completed in the order you choose</li>
+                            <li>No advance preparation or pre-staging allowed</li>
+                            <li>All activities must be legal and safe</li>
+                            <li>Respect business hours and private events</li>
+                        </ul>
+
+                        <h4>Submission Rules</h4>
+                        <ul class="rules-list">
+                            <li>Submit photos as soon as possible after completion</li>
+                            <li>Use proper file naming conventions (see submission page)</li>
+                            <li>Late submissions may not be counted</li>
+                            <li>Organizers have final say on photo validity</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- How to Win -->
+                <div class="rules-section" id="winning">
+                    <div class="rules-card">
+                        <h3>🥇 How to Win</h3>
+                        
+                        <h4>Victory Conditions</h4>
+                        <ul class="rules-list">
+                            <li>Team with the highest total points at the end of the game period wins</li>
+                            <li>Points are calculated from all valid photo submissions</li>
+                            <li>Ties are broken by the team with more completed challenges</li>
+                            <li>If still tied, the team with more bonus points wins</li>
+                        </ul>
+
+                        <h4>🎯 Winning Strategies</h4>
+                        <ul class="rules-list">
+                            <li>Balance high-point neighborhoods with travel time</li>
+                            <li>Focus on challenges you can complete efficiently</li>
+                            <li>Plan your route to minimize backtracking</li>
+                            <li>Consider bonus points for challenges you're already doing</li>
+                            <li>Keep track of time - don't get stuck in one area too long</li>
+                            <li>Have backup challenges ready in case your first choice isn't possible</li>
+                        </ul>
+
+                        <div class="highlight">
+                            <strong>🏆 Remember:</strong> The goal is to have fun exploring NYC while being competitive. Play fair, be safe, and enjoy the adventure!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025....Not actually...but wouldn't that be cool?</p>
+        </div>
+    </footer>
+
+    <script src="../js/nav.js"></script>
+</body>
+</html>
