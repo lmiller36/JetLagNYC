@@ -86,6 +86,7 @@ function checkInitialState() {
 function handleSignIn() {
     updateTeamUI();
     loadSavedTeam();
+    ensureTeamFolderExists();
 }
 
 /**
@@ -157,6 +158,55 @@ function loadSavedTeam() {
         
         // Notify other components that team is loaded (for navigation bar)
         window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName: savedTeam } }));
+        
+        // Ensure Drive folder exists for this team
+        ensureTeamFolderExists();
+    }
+}
+
+/**
+ * Ensure Google Drive folder exists for current team
+ * @param {number} retryCount - Number of retries attempted
+ */
+async function ensureTeamFolderExists(retryCount = 0) {
+    const maxRetries = 5;
+    
+    if (!currentTeam) return;
+    
+    // Check if driveManager is available
+    if (!window.driveManager) {
+        console.log('DriveManager not available yet');
+        return;
+    }
+    
+    // Check if Google API is loaded
+    if (typeof gapi === 'undefined' || !gapi.client) {
+        if (retryCount < maxRetries) {
+            console.log(`Google API not loaded yet, retry ${retryCount + 1}/${maxRetries}...`);
+            setTimeout(() => ensureTeamFolderExists(retryCount + 1), 1000 * (retryCount + 1));
+        }
+        return;
+    }
+    
+    // Check if user has a token (same check as sheets integration)
+    const token = gapi.client.getToken();
+    if (!token) {
+        console.log('User not signed in, skipping folder check');
+        return;
+    }
+    
+    try {
+        console.log(`Ensuring Drive folder exists for team: ${currentTeam}`);
+        const folderId = await window.driveManager.ensureTeamFolder(currentTeam);
+        console.log(`Team folder ready: ${folderId}`);
+    } catch (error) {
+        console.error('Error ensuring team folder exists:', error);
+        // If it's an auth error and we haven't retried too many times, try again
+        if (error.message.includes('not loaded') && retryCount < maxRetries) {
+            console.log(`Retrying due to API error, attempt ${retryCount + 1}/${maxRetries}...`);
+            setTimeout(() => ensureTeamFolderExists(retryCount + 1), 1000 * (retryCount + 1));
+        }
+        // Don't show alert, just log - this is a background operation
     }
 }
 
@@ -182,6 +232,10 @@ async function joinTeam() {
         localStorage.setItem('scavenger_team', teamName);
         updateTeamUI();
         window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
+        
+        // Ensure Drive folder exists for joined team
+        ensureTeamFolderExists();
+        
         alert(`Successfully joined team "${teamName}"!`);
     } catch (err) {
         alert('Error joining team: ' + err.message);
@@ -230,6 +284,19 @@ async function createTeam() {
         const allChallenges = loadAllChallenges();
         console.log('Loaded challenges:', allChallenges.length);
         await window.SheetsAPI.initializeTeamSheet(teamName, allChallenges);
+        
+        // Create Google Drive folder for team
+        console.log('Creating Google Drive folder for team...');
+        try {
+            const folderId = await window.driveManager.createTeamFolder(teamName);
+            console.log('Team folder created:', folderId);
+            // Store folder ID in localStorage for future reference
+            localStorage.setItem(`team_folder_${teamName}`, folderId);
+        } catch (driveError) {
+            console.error('Error creating Drive folder:', driveError);
+            // Don't fail team creation if Drive folder fails
+            alert(`Team created successfully, but there was an issue creating the Google Drive folder: ${driveError.message}`);
+        }
         
         currentTeam = teamName;
         localStorage.setItem('scavenger_team', teamName);

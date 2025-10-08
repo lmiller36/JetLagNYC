@@ -8,7 +8,7 @@ const SHEET_ID = '1RYK0ZPu1ac9xMiwMz-8DCX_loFWleObcN5O0HQzk7iM';
 
 // Google Sheets API configuration
 const CLIENT_ID = '176356314161-475e7q7todmkgrnq2ihks8c9sc9jmk4s.apps.googleusercontent.com'; // Replace with your OAuth 2.0 Client ID
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
 const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
 let tokenClient;

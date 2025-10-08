@@ -453,8 +453,12 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="photo-links">Photo Links (Google Drive):</label>
-                        <textarea id="photo-links" placeholder="Paste Google Drive photo links here"></textarea>
+                        <label for="photo-upload">Challenge Photos:</label>
+                        <input type="file" id="photo-upload" accept="image/*" multiple style="display: none;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('photo-upload').click()">
+                            📷 Select Photos
+                        </button>
+                        <div id="photo-preview" class="photo-preview"></div>
                     </div>
                     
                     <div class="form-group">
@@ -493,6 +497,24 @@
             `;
         }
 
+        // Handle photo selection
+        const photoInput = modal.querySelector('#photo-upload');
+        const photoPreview = modal.querySelector('#photo-preview');
+        let selectedPhotos = [];
+
+        photoInput.addEventListener('change', (e) => {
+            selectedPhotos = Array.from(e.target.files);
+            if (selectedPhotos.length > 0) {
+                photoPreview.innerHTML = `
+                    <div class="photo-count">
+                        ✓ ${selectedPhotos.length} photo${selectedPhotos.length > 1 ? 's' : ''} selected
+                    </div>
+                `;
+            } else {
+                photoPreview.innerHTML = '';
+            }
+        });
+
         const form = modal.querySelector('#completion-form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -504,10 +526,33 @@
 
             const neighborhoodBonus = parseInt(document.getElementById('neighborhood-bonus').value) || 0;
             const otherBonus = parseInt(document.getElementById('other-bonus').value) || 0;
-            const photoLinks = document.getElementById('photo-links').value;
             const notes = document.getElementById('notes').value;
 
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
             try {
+                let photoLinks = '';
+
+                // Upload photos to Google Drive if any selected
+                if (selectedPhotos.length > 0) {
+                    // Ensure team folder exists (creates if needed)
+                    const teamFolderId = await window.driveManager.ensureTeamFolder(teamName);
+
+                    // Upload photos
+                    const uploadedPhotos = await window.driveManager.uploadChallengePhotos(
+                        teamName,
+                        challenge.id,
+                        selectedPhotos,
+                        teamFolderId
+                    );
+
+                    // Create links string
+                    photoLinks = uploadedPhotos
+                        .map(photo => `https://drive.google.com/file/d/${photo.id}/view`)
+                        .join('\n');
+                }
+
                 // Update or add challenge in Google Sheets
                 const success = await window.SheetsAPI.updateOrAddChallengeByName(
                     teamName, 
@@ -551,6 +596,8 @@
             } catch (error) {
                 console.error('Error completing challenge:', error);
                 alert('Error uploading to Google Sheets: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit to Google Sheets';
             }
         });
 
