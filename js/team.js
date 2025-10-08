@@ -2,19 +2,28 @@
  * Team management functionality
  */
 
-// Sample challenge list - should match your actual challenges
-const ALL_CHALLENGES = [
-    'Find a hot dog cart',
-    'Take a photo with a street performer',
-    'Visit the Brooklyn Bridge',
-    'Find a bodega cat',
-    'Ride the subway',
-    'Visit Central Park',
-    'Find a yellow taxi',
-    'Visit Times Square',
-    'Find street art',
-    'Visit the Statue of Liberty'
-];
+/**
+ * Load all challenges from embedded data files
+ */
+function loadAllChallenges() {
+    const allChallenges = [];
+    
+    // Load from embedded challenge data
+    if (window.CHALLENGES_EASY?.challenges) {
+        allChallenges.push(...window.CHALLENGES_EASY.challenges);
+    }
+    if (window.CHALLENGES_MEDIUM?.challenges) {
+        allChallenges.push(...window.CHALLENGES_MEDIUM.challenges);
+    }
+    if (window.CHALLENGES_HARD?.challenges) {
+        allChallenges.push(...window.CHALLENGES_HARD.challenges);
+    }
+    if (window.CHALLENGES_LOCATION?.challenges) {
+        allChallenges.push(...window.CHALLENGES_LOCATION.challenges);
+    }
+    
+    return allChallenges;
+}
 
 let currentTeam = null;
 
@@ -217,8 +226,10 @@ async function createTeam() {
         }
 
         console.log('Creating new team sheet...');
-        // Create the team sheet with just the header (no challenges pre-populated)
-        await window.SheetsAPI.initializeTeamSheet(teamName);
+        // Load all challenges and create the team sheet
+        const allChallenges = loadAllChallenges();
+        console.log('Loaded challenges:', allChallenges.length);
+        await window.SheetsAPI.initializeTeamSheet(teamName, allChallenges);
         
         currentTeam = teamName;
         localStorage.setItem('scavenger_team', teamName);

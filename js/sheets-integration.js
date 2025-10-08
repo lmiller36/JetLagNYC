@@ -160,14 +160,16 @@ async function appendSheetData(range, values) {
  * @returns {Promise<Array>} Array of challenge objects
  */
 async function getTeamChallenges(teamName) {
-    const data = await readSheetData(`${teamName}!A2:F`);
+    const data = await readSheetData(`${teamName}!A2:H`);
     return data.map(row => ({
-        challengeName: row[0] || '',
-        location: row[1] || '',
-        neighborhoodBonus: parseInt(row[2]) || 0,
-        otherBonus: parseInt(row[3]) || 0,
-        photoLinks: row[4] || '',
-        notes: row[5] || ''
+        challengeId: row[0] || '',
+        challengeName: row[1] || '',
+        basePoints: parseInt(row[2]) || 0,
+        location: row[3] || '',
+        neighborhoodBonus: parseInt(row[4]) || 0,
+        otherBonus: parseInt(row[5]) || 0,
+        photoLinks: row[6] || '',
+        notes: row[7] || ''
     }));
 }
 
@@ -179,7 +181,9 @@ async function getTeamChallenges(teamName) {
  */
 async function updateTeamChallenge(teamName, rowNumber, challengeData) {
     const row = [
+        challengeData.challengeId || '',
         challengeData.challengeName || '',
+        challengeData.basePoints || 0,
         challengeData.location || '',
         challengeData.neighborhoodBonus || 0,
         challengeData.otherBonus || 0,
@@ -187,7 +191,7 @@ async function updateTeamChallenge(teamName, rowNumber, challengeData) {
         challengeData.notes || ''
     ];
 
-    await writeSheetData(`${teamName}!A${rowNumber}:F${rowNumber}`, [row]);
+    await writeSheetData(`${teamName}!A${rowNumber}:H${rowNumber}`, [row]);
 }
 
 /**
@@ -198,21 +202,23 @@ async function updateTeamChallenge(teamName, rowNumber, challengeData) {
  * @returns {Promise<boolean>} True if found and updated, false otherwise
  */
 async function updateChallengeByName(teamName, challengeName, updateData) {
-    const challenges = await readSheetData(`${teamName}!A2:F`);
+    const challenges = await readSheetData(`${teamName}!A2:H`);
 
     for (let i = 0; i < challenges.length; i++) {
-        if (challenges[i][0] === challengeName) {
+        if (challenges[i][1] === challengeName) { // challengeName is now in column B (index 1)
             const rowNumber = i + 2; // +2 for header row and 0-indexing
             const row = [
+                challenges[i][0] || '', // challengeId
                 challengeName,
-                updateData.location || challenges[i][1] || '',
-                updateData.neighborhoodBonus !== undefined ? updateData.neighborhoodBonus : (challenges[i][2] || 0),
-                updateData.otherBonus !== undefined ? updateData.otherBonus : (challenges[i][3] || 0),
-                updateData.photoLinks || challenges[i][4] || '',
-                updateData.notes || challenges[i][5] || ''
+                challenges[i][2] || 0, // basePoints
+                updateData.location || challenges[i][3] || '',
+                updateData.neighborhoodBonus !== undefined ? updateData.neighborhoodBonus : (challenges[i][4] || 0),
+                updateData.otherBonus !== undefined ? updateData.otherBonus : (challenges[i][5] || 0),
+                updateData.photoLinks || challenges[i][6] || '',
+                updateData.notes || challenges[i][7] || ''
             ];
 
-            await writeSheetData(`${teamName}!A${rowNumber}:F${rowNumber}`, [row]);
+            await writeSheetData(`${teamName}!A${rowNumber}:H${rowNumber}`, [row]);
             return true;
         }
     }
@@ -226,15 +232,15 @@ async function updateChallengeByName(teamName, challengeName, updateData) {
  * @param {string} photoLink - Google Drive link to add (comma-separated if multiple)
  */
 async function addPhotoToChallenge(teamName, challengeName, photoLink) {
-    const challenges = await readSheetData(`${teamName}!A2:F`);
+    const challenges = await readSheetData(`${teamName}!A2:H`);
 
     for (let i = 0; i < challenges.length; i++) {
-        if (challenges[i][0] === challengeName) {
+        if (challenges[i][1] === challengeName) { // challengeName is now in column B (index 1)
             const rowNumber = i + 2;
-            const existingPhotos = challenges[i][4] || '';
+            const existingPhotos = challenges[i][6] || ''; // photoLinks is now in column G (index 6)
             const newPhotos = existingPhotos ? `${existingPhotos}, ${photoLink}` : photoLink;
 
-            await writeSheetData(`${teamName}!E${rowNumber}`, [[newPhotos]]);
+            await writeSheetData(`${teamName}!G${rowNumber}`, [[newPhotos]]);
             return true;
         }
     }
@@ -247,19 +253,22 @@ async function addPhotoToChallenge(teamName, challengeName, photoLink) {
  * @returns {Promise<Object>} Score breakdown
  */
 async function calculateTeamScore(teamName) {
-    const challenges = await readSheetData(`${teamName}!A2:F`);
+    const challenges = await readSheetData(`${teamName}!A2:H`);
 
+    let totalBasePoints = 0;
     let totalNeighborhoodBonus = 0;
     let totalOtherBonus = 0;
     let completedChallenges = 0;
 
     challenges.forEach(row => {
-        const location = row[1] || '';
-        const neighborhoodBonus = parseInt(row[2]) || 0;
-        const otherBonus = parseInt(row[3]) || 0;
+        const basePoints = parseInt(row[2]) || 0;
+        const location = row[3] || '';
+        const neighborhoodBonus = parseInt(row[4]) || 0;
+        const otherBonus = parseInt(row[5]) || 0;
 
         if (location) { // Challenge is completed if location is filled
             completedChallenges++;
+            totalBasePoints += basePoints;
             totalNeighborhoodBonus += neighborhoodBonus;
             totalOtherBonus += otherBonus;
         }
@@ -268,9 +277,10 @@ async function calculateTeamScore(teamName) {
     return {
         teamName,
         completedChallenges,
+        totalBasePoints,
         totalNeighborhoodBonus,
         totalOtherBonus,
-        totalScore: totalNeighborhoodBonus + totalOtherBonus,
+        totalScore: totalBasePoints + totalNeighborhoodBonus + totalOtherBonus,
         totalChallenges: challenges.length
     };
 }
@@ -321,7 +331,7 @@ async function sheetExists(sheetName) {
 /**
  * Initialize a team sheet with all challenges
  * @param {string} teamName - Name of the team (sheet name)
- * @param {Array} challengeList - Array of challenge names
+ * @param {Array} challengeList - Array of challenge objects with id, title, and basePoints
  */
 async function initializeTeamSheet(teamName, challengeList = []) {
     // Check if sheet exists, create if not
@@ -330,25 +340,28 @@ async function initializeTeamSheet(teamName, challengeList = []) {
         await createSheet(teamName);
     }
 
-    const header = [['Challenge Name', 'Location', 'Neighborhood Bonus', 'Other Bonus', 'Photo Links', 'Notes']];
+    const header = [['Challenge ID', 'Challenge Name', 'Base Points', 'Location', 'Neighborhood Bonus', 'Other Bonus', 'Photo Links', 'Notes']];
 
     // Write header
-    await writeSheetData(`${teamName}!A1:F1`, header);
+    await writeSheetData(`${teamName}!A1:H1`, header);
 
     // Only write challenges if provided
     if (challengeList && challengeList.length > 0) {
-        const rows = challengeList.map(challenge => [challenge, '', 0, 0, '', '']);
-        await writeSheetData(`${teamName}!A2:F${rows.length + 1}`, rows);
+        const rows = challengeList.map(challenge => [
+            challenge.id || '',
+            challenge.title || challenge.name || challenge,
+            challenge.basePoints || 0,
+            '', // location
+            0,  // neighborhood bonus
+            0,  // other bonus
+            '', // photo links
+            ''  // notes
+        ]);
+        await writeSheetData(`${teamName}!A2:H${rows.length + 1}`, rows);
     }
 }
 
-// Initialize when the page loads
-window.addEventListener('load', () => {
-    initializeGoogleAPI();
-    initializeGIS();
-});
-
-// Export functions for use in other scripts
+// Export functions for use in other scripts (export immediately, not in load event)
 window.SheetsAPI = {
     handleAuthClick,
     handleSignoutClick,
@@ -364,3 +377,9 @@ window.SheetsAPI = {
     calculateTeamScore,
     initializeTeamSheet
 };
+
+// Initialize when the page loads
+window.addEventListener('load', () => {
+    initializeGoogleAPI();
+    initializeGIS();
+});
