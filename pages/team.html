@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team - NYC Scavenger Hunt</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/team.css">
+</head>
+<body>
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h2>Team Management</h2>
+                <p>Join or create your scavenger hunt team</p>
+            </div>
+        </section>
+
+        <section class="team-section">
+            <div class="container">
+                <div id="notLoggedIn" class="auth-prompt">
+                    <h3>Sign in to manage your team</h3>
+                    <button id="signInBtn" class="btn-primary">Sign in with Google</button>
+                </div>
+
+                <div id="teamManagement" style="display: none;">
+                    <div id="noTeam" class="team-card">
+                        <h3>You're not on a team yet</h3>
+                        <p>Join an existing team or create a new one</p>
+                        
+                        <div class="team-actions">
+                            <div class="action-card">
+                                <h4>Join Existing Team</h4>
+                                <input type="text" id="joinTeamName" placeholder="Enter exact team name" class="team-input">
+                                <button id="joinTeamBtn" class="btn-primary">Join Team</button>
+                            </div>
+
+                            <div class="action-card">
+                                <h4>Create New Team</h4>
+                                <input type="text" id="createTeamName" placeholder="Enter new team name" class="team-input">
+                                <button id="createTeamBtn" class="btn-primary">Create Team</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="hasTeam" style="display: none;">
+                        <div class="team-card">
+                            <h3>Your Team: <span id="currentTeamName"></span></h3>
+                            <button id="leaveTeamBtn" class="btn-secondary">Leave Team</button>
+                        </div>
+
+                        <div class="score-card">
+                            <h3>Team Score</h3>
+                            <div id="scoreDisplay" class="score-display">
+                                <div class="score-loading">Loading score...</div>
+                            </div>
+                            <button id="refreshScoreBtn" class="btn-secondary">Refresh Score</button>
+                        </div>
+
+                        <div class="challenges-card">
+                            <h3>Challenge Progress</h3>
+                            <div id="challengeProgress" class="challenge-progress">
+                                <div class="score-loading">Loading challenges...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025....Not actually...but wouldn't that be cool?</p>
+        </div>
+    </footer>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="../js/shared-nav.js"></script>
+    <script src="../js/sheets-integration.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/nav.js"></script>
+    <script src="../js/team.js"></script>
+</body>
+</html>
