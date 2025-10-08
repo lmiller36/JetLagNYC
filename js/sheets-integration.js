@@ -226,6 +226,57 @@ async function updateChallengeByName(teamName, challengeName, updateData) {
 }
 
 /**
+ * Add a new challenge to the team sheet
+ * @param {string} teamName - Name of the team (sheet name)
+ * @param {Object} challengeData - Challenge data including id, title, basePoints
+ * @returns {Promise<boolean>} True if added successfully
+ */
+async function addChallengeToTeam(teamName, challengeData) {
+    try {
+        const row = [
+            challengeData.id || '',
+            challengeData.title || challengeData.name || '',
+            challengeData.basePoints || 0,
+            challengeData.location || '',
+            challengeData.neighborhoodBonus || 0,
+            challengeData.otherBonus || 0,
+            challengeData.photoLinks || '',
+            challengeData.notes || ''
+        ];
+
+        await appendSheetData(`${teamName}!A:H`, [row]);
+        return true;
+    } catch (err) {
+        console.error('Error adding challenge to team:', err);
+        return false;
+    }
+}
+
+/**
+ * Update or add a challenge by name
+ * @param {string} teamName - Name of the team (sheet name)
+ * @param {string} challengeName - Name of the challenge to find
+ * @param {Object} updateData - Data to update (location, bonuses, photos, notes)
+ * @param {Object} challengeFullData - Full challenge data (id, title, basePoints) for adding if not found
+ * @returns {Promise<boolean>} True if found/added and updated, false otherwise
+ */
+async function updateOrAddChallengeByName(teamName, challengeName, updateData, challengeFullData = null) {
+    // Try to update existing challenge
+    const updated = await updateChallengeByName(teamName, challengeName, updateData);
+
+    if (!updated && challengeFullData) {
+        // Challenge not found, add it
+        const added = await addChallengeToTeam(teamName, {
+            ...challengeFullData,
+            ...updateData
+        });
+        return added;
+    }
+
+    return updated;
+}
+
+/**
  * Add photo links to a challenge
  * @param {string} teamName - Name of the team (sheet name)
  * @param {string} challengeName - Name of the challenge
@@ -373,6 +424,8 @@ window.SheetsAPI = {
     getTeamChallenges,
     updateTeamChallenge,
     updateChallengeByName,
+    updateOrAddChallengeByName,
+    addChallengeToTeam,
     addPhotoToChallenge,
     calculateTeamScore,
     initializeTeamSheet

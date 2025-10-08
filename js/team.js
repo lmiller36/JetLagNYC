@@ -272,6 +272,10 @@ async function loadTeamScore() {
                 <span class="score-value">${score.completedChallenges} / ${score.totalChallenges}</span>
             </div>
             <div class="score-item">
+                <span class="score-label">Base Points:</span>
+                <span class="score-value">${score.totalBasePoints} pts</span>
+            </div>
+            <div class="score-item">
                 <span class="score-label">Neighborhood Bonus:</span>
                 <span class="score-value">${score.totalNeighborhoodBonus} pts</span>
             </div>
@@ -301,13 +305,13 @@ async function loadTeamChallenges() {
         
         progressDiv.innerHTML = challenges.map(challenge => {
             const isCompleted = challenge.location !== '';
-            const totalPoints = challenge.neighborhoodBonus + challenge.otherBonus;
+            const totalPoints = challenge.basePoints + challenge.neighborhoodBonus + challenge.otherBonus;
             
             return `
                 <div class="challenge-item ${isCompleted ? 'completed' : ''}">
                     <span class="challenge-name">${challenge.challengeName}</span>
                     <div class="challenge-status">
-                        ${isCompleted ? `<span>${totalPoints} pts</span>` : ''}
+                        ${isCompleted ? `<span>${totalPoints} pts</span>` : `<span>${challenge.basePoints} base pts</span>`}
                         <span class="status-badge ${isCompleted ? 'completed' : 'pending'}">
                             ${isCompleted ? 'Completed' : 'Pending'}
                         </span>

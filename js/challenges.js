@@ -180,6 +180,10 @@
     }
 
     function createChallengeCard(challenge) {
+        const status = getChallengeStatus(challenge.id);
+        const isInProgress = status === 'in-progress';
+        const isCompleted = status === 'completed';
+
         let bonusPointsHTML = '';
         if (challenge.bonuses && challenge.bonuses.length > 0) {
             bonusPointsHTML = `
@@ -218,8 +222,27 @@
             </div>
         ` : '';
 
+        const actionsHTML = `
+            <div class="challenge-actions">
+                ${!isCompleted ? `
+                    <button class="btn btn-primary ${isInProgress ? 'btn-success' : ''}" 
+                            onclick="window.Challenges.toggleInProgress('${challenge.id}')"
+                            data-challenge-id="${challenge.id}">
+                        ${isInProgress ? '✓ In Progress' : 'Start Challenge'}
+                    </button>
+                ` : ''}
+                ${isInProgress || isCompleted ? `
+                    <button class="btn btn-secondary" 
+                            onclick="window.Challenges.completeChallenge('${challenge.id}')"
+                            data-challenge-id="${challenge.id}">
+                        ${isCompleted ? '✓ Completed' : 'Complete & Upload'}
+                    </button>
+                ` : ''}
+            </div>
+        `;
+
         return `
-            <div class="challenge-card">
+            <div class="challenge-card ${isInProgress ? 'in-progress' : ''} ${isCompleted ? 'completed' : ''}" data-challenge-id="${challenge.id}">
                 <div class="challenge-header">
                     <h3 class="challenge-title">${challenge.title}</h3>
                     <div class="challenge-points">${challenge.basePoints} pts</div>
@@ -236,6 +259,8 @@
                     ${bonusPointsHTML}
                     ${requirementsHTML}
                 </div>
+                
+                ${actionsHTML}
             </div>
         `;
     }
@@ -328,10 +353,164 @@
         }
     }
 
+    // Challenge status management
+    function getChallengeStatus(challengeId) {
+        const inProgress = JSON.parse(localStorage.getItem('challenges_in_progress') || '[]');
+        const completed = JSON.parse(localStorage.getItem('challenges_completed') || '[]');
+
+        if (completed.includes(challengeId)) return 'completed';
+        if (inProgress.includes(challengeId)) return 'in-progress';
+        return 'not-started';
+    }
+
+    function toggleInProgress(challengeId) {
+        const inProgress = JSON.parse(localStorage.getItem('challenges_in_progress') || '[]');
+        const index = inProgress.indexOf(challengeId);
+
+        if (index > -1) {
+            inProgress.splice(index, 1);
+        } else {
+            inProgress.push(challengeId);
+        }
+
+        localStorage.setItem('challenges_in_progress', JSON.stringify(inProgress));
+        displayChallenges(); // Refresh display
+    }
+
+    async function completeChallenge(challengeId) {
+        const challenge = challengesData.find(c => c.id === challengeId);
+        if (!challenge) {
+            alert('Challenge not found');
+            return;
+        }
+
+        // Check if user is signed in and has a team
+        // Check both in-memory and localStorage
+        const teamName = window.Team?.getCurrentTeam() || localStorage.getItem('scavenger_team');
+        if (!teamName) {
+            alert('Please join or create a team first on the Team page');
+            return;
+        }
+
+        // Check if authenticated
+        if (typeof gapi === 'undefined' || !gapi.client?.getToken()) {
+            alert('Please sign in with Google first');
+            return;
+        }
+
+        // Show completion modal
+        showCompletionModal(challenge, teamName);
+    }
+
+    function showCompletionModal(challenge, teamName) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2>Complete Challenge</h2>
+                <h3>${challenge.title}</h3>
+                
+                <form id="completion-form">
+                    <div class="form-group">
+                        <label for="location">Location Completed:</label>
+                        <input type="text" id="location" required placeholder="e.g., Central Park, Brooklyn Bridge">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="neighborhood-bonus">Neighborhood Bonus Points:</label>
+                        <input type="number" id="neighborhood-bonus" value="0" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="other-bonus">Other Bonus Points:</label>
+                        <input type="number" id="other-bonus" value="0" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="photo-links">Photo Links (Google Drive):</label>
+                        <textarea id="photo-links" placeholder="Paste Google Drive photo links here"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes:</label>
+                        <textarea id="notes" placeholder="Any additional notes about this challenge"></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">Submit to Google Sheets</button>
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const form = modal.querySelector('#completion-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const location = document.getElementById('location').value;
+            const neighborhoodBonus = parseInt(document.getElementById('neighborhood-bonus').value) || 0;
+            const otherBonus = parseInt(document.getElementById('other-bonus').value) || 0;
+            const photoLinks = document.getElementById('photo-links').value;
+            const notes = document.getElementById('notes').value;
+
+            try {
+                // Update or add challenge in Google Sheets
+                const success = await window.SheetsAPI.updateOrAddChallengeByName(
+                    teamName, 
+                    challenge.title, 
+                    {
+                        location,
+                        neighborhoodBonus,
+                        otherBonus,
+                        photoLinks,
+                        notes
+                    },
+                    {
+                        id: challenge.id,
+                        title: challenge.title,
+                        basePoints: challenge.basePoints
+                    }
+                );
+
+                if (success) {
+                    // Mark as completed locally
+                    const completed = JSON.parse(localStorage.getItem('challenges_completed') || '[]');
+                    if (!completed.includes(challenge.id)) {
+                        completed.push(challenge.id);
+                        localStorage.setItem('challenges_completed', JSON.stringify(completed));
+                    }
+
+                    // Remove from in-progress
+                    const inProgress = JSON.parse(localStorage.getItem('challenges_in_progress') || '[]');
+                    const index = inProgress.indexOf(challenge.id);
+                    if (index > -1) {
+                        inProgress.splice(index, 1);
+                        localStorage.setItem('challenges_in_progress', JSON.stringify(inProgress));
+                    }
+
+                    modal.remove();
+                    displayChallenges(); // Refresh display
+                    alert('Challenge completed and uploaded to Google Sheets!');
+                } else {
+                    alert('Error uploading to Google Sheets. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error completing challenge:', error);
+                alert('Error uploading to Google Sheets: ' + error.message);
+            }
+        });
+    }
+
     // Expose functions for potential external use
     window.Challenges = {
         filterChallenges: filterChallenges,
         clearAllFilters: clearAllFilters,
-        loadChallengesData: loadChallengesData
+        loadChallengesData: loadChallengesData,
+        toggleInProgress: toggleInProgress,
+        completeChallenge: completeChallenge,
+        getChallengeStatus: getChallengeStatus
     };
 })();
