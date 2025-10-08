@@ -199,8 +199,47 @@
 
 .score-loading {
     text-align: center;
-    padding: 20px;
+    padding: 40px 20px;
     color: #6c757d;
+}
+
+.score-loading p {
+    margin: 10px 0 0 0;
+    font-size: 16px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 10px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.score-error {
+    text-align: center;
+    padding: 30px 20px;
+    color: #721c24;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+}
+
+.score-error p {
+    margin: 10px 0;
+}
+
+.error-detail {
+    font-size: 14px;
+    color: #856404;
+    font-family: monospace;
 }
 
 .user-info {

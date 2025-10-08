@@ -8,6 +8,19 @@
 
     let challengesData = [];
     let filteredChallenges = [];
+    let teamChallengesCache = null; // In-memory cache
+
+    /**
+     * Escape HTML to prevent XSS attacks
+     * @param {string} str - String to escape
+     * @returns {string} Escaped HTML string
+     */
+    function escapeHTML(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
 
     // DOM elements
     let searchInput;
@@ -18,6 +31,16 @@
     let challengesContainer;
     let resultsCount;
     let noResults;
+    let filterChips;
+    let searchToggle;
+    let searchBox;
+    let searchClose;
+    let moreFiltersBtn;
+    let moreFiltersPanel;
+    let applyFiltersBtn;
+
+    // Current filter state
+    let currentCategory = 'all';
 
     // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', function () {
@@ -35,6 +58,15 @@
         resultsCount = document.getElementById('results-count');
         noResults = document.getElementById('no-results');
 
+        // New chip-based UI elements
+        searchToggle = document.getElementById('search-toggle');
+        searchBox = document.getElementById('search-box');
+        searchClose = document.getElementById('search-close');
+        moreFiltersBtn = document.getElementById('more-filters');
+        moreFiltersPanel = document.getElementById('more-filters-panel');
+        applyFiltersBtn = document.getElementById('apply-filters');
+        filterChips = document.querySelectorAll('.filter-chip');
+
         // Set up event listeners
         setupEventListeners();
 
@@ -43,6 +75,53 @@
     }
 
     function setupEventListeners() {
+        // Filter chips
+        if (filterChips) {
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    setActiveChip(category);
+                    currentCategory = category;
+                    filterChallenges();
+                });
+            });
+        }
+
+        // Search toggle
+        if (searchToggle && searchBox) {
+            searchToggle.addEventListener('click', function() {
+                searchBox.style.display = searchBox.style.display === 'none' ? 'flex' : 'none';
+                if (searchBox.style.display === 'flex') {
+                    searchInput.focus();
+                }
+            });
+        }
+
+        // Search close
+        if (searchClose) {
+            searchClose.addEventListener('click', function() {
+                searchBox.style.display = 'none';
+                searchInput.value = '';
+                filterChallenges();
+            });
+        }
+
+        // More filters toggle
+        if (moreFiltersBtn && moreFiltersPanel) {
+            moreFiltersBtn.addEventListener('click', function() {
+                const isVisible = moreFiltersPanel.style.display !== 'none';
+                moreFiltersPanel.style.display = isVisible ? 'none' : 'block';
+            });
+        }
+
+        // Apply filters button
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', function() {
+                moreFiltersPanel.style.display = 'none';
+                filterChallenges();
+            });
+        }
+
         if (searchInput) {
             // Debounced search input
             let searchTimeout;
@@ -67,6 +146,31 @@
         if (clearFiltersBtn) {
             clearFiltersBtn.addEventListener('click', clearAllFilters);
         }
+
+        // Refresh status button
+        const refreshStatusBtn = document.getElementById('refresh-status-btn');
+        if (refreshStatusBtn) {
+            refreshStatusBtn.addEventListener('click', async function() {
+                this.disabled = true;
+                this.textContent = '🔄 Refreshing...';
+
+                await loadTeamChallengesCache(true); // Force refresh from Sheets
+
+                this.disabled = false;
+                this.textContent = '🔄 Refresh Status';
+            });
+        }
+
+        // Listen for team changes to clear cache
+        window.addEventListener('teamChanged', function() {
+            clearTeamChallengesCache();
+            loadTeamChallengesCache(); // Load new team's cache
+        });
+
+        // Listen for sign out to clear cache
+        window.addEventListener('userSignedOut', function() {
+            clearTeamChallengesCache();
+        });
     }
 
     async function loadChallengesData() {
@@ -100,6 +204,11 @@
                     ];
 
                     filteredChallenges = [...challengesData];
+                    updateChipCounts();
+
+                    // Load team challenges cache for completion status
+                    await loadTeamChallengesCache();
+
                     displayChallenges();
                     updateResultsCount();
                     return;
@@ -109,7 +218,7 @@
             }
 
             // Fallback to embedded data for file:// protocol
-            loadEmbeddedChallengesData();
+            await loadEmbeddedChallengesData();
 
         } catch (error) {
             console.error('Error loading challenges data:', error);
@@ -117,7 +226,7 @@
         }
     }
 
-    function loadEmbeddedChallengesData() {
+    async function loadEmbeddedChallengesData() {
         // Embedded challenges data loaded from separate JS files
         // These files are included via script tags in challenges.html
         const easyData = window.CHALLENGES_EASY || { challenges: [] };
@@ -127,13 +236,18 @@
 
         challengesData = [...easyData.challenges, ...mediumData.challenges, ...hardData.challenges, ...locationData.challenges];
         filteredChallenges = [...challengesData];
+        updateChipCounts();
+
+        // Load team challenges cache for completion status BEFORE displaying
+        await loadTeamChallengesCache();
+
         displayChallenges();
         updateResultsCount();
     }
 
     function filterChallenges() {
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-        const selectedCategory = categoryFilter ? categoryFilter.value : 'all';
+        const selectedCategory = currentCategory || 'all';
         const sortOrder = pointsSort ? pointsSort.value : 'default';
         const completionStatus = completionFilter ? completionFilter.value : 'all';
 
@@ -204,6 +318,15 @@
         const isInProgress = status === 'in-progress';
         const isCompleted = status === 'completed';
 
+        // Get category icon
+        const categoryIcons = {
+            'easy': '⚡',
+            'medium': '🔥',
+            'hard': '💪',
+            'location-specific': '📍'
+        };
+        const categoryIcon = categoryIcons[challenge.category] || '📋';
+
         let bonusPointsHTML = '';
         if (challenge.bonuses && challenge.bonuses.length > 0) {
             bonusPointsHTML = `
@@ -245,14 +368,14 @@
         const actionsHTML = `
             <div class="challenge-actions">
                 ${!isCompleted ? `
-                    <button class="btn btn-primary ${isInProgress ? 'btn-success' : ''}" 
+                    <button class="btn btn-primary ${isInProgress ? 'btn-success' : ''}"
                             onclick="window.Challenges.toggleInProgress('${challenge.id}')"
                             data-challenge-id="${challenge.id}">
                         ${isInProgress ? '✓ In Progress' : 'Start Challenge'}
                     </button>
                 ` : ''}
                 ${isInProgress || isCompleted ? `
-                    <button class="btn btn-secondary" 
+                    <button class="btn btn-secondary"
                             onclick="window.Challenges.completeChallenge('${challenge.id}')"
                             data-challenge-id="${challenge.id}">
                         ${isCompleted ? '✓ Completed' : 'Complete & Upload'}
@@ -261,28 +384,84 @@
             </div>
         `;
 
+        // Create collapsed card with preview
         return `
-            <div class="challenge-card ${isInProgress ? 'in-progress' : ''} ${isCompleted ? 'completed' : ''}" data-challenge-id="${challenge.id}">
-                <div class="challenge-header">
-                    <h3 class="challenge-title">${challenge.title}</h3>
-                    <div class="challenge-points">${challenge.basePoints} pts</div>
+            <div class="challenge-card collapsed ${isInProgress ? 'in-progress' : ''} ${isCompleted ? 'completed' : ''}"
+                 data-challenge-id="${escapeHTML(challenge.id)}"
+                 onclick="window.Challenges.toggleCard(this)">
+                <div class="card-preview">
+                    <div class="preview-left">
+                        <span class="category-icon ${challenge.category}">${categoryIcon}</span>
+                        <div class="preview-content">
+                            <h3>${escapeHTML(challenge.title)}</h3>
+                            <p class="preview-snippet">${escapeHTML(challenge.description)}</p>
+                        </div>
+                    </div>
+                    <div class="preview-right">
+                        <span class="points-badge">${challenge.basePoints} pts</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
                 </div>
-                
-                <div class="challenge-category category-${challenge.category}">
-                    ${formatCategoryName(challenge.category)}
+
+                <div class="card-expanded">
+                    <div class="challenge-category category-${challenge.category}">
+                        ${formatCategoryName(challenge.category)}
+                    </div>
+
+                    <p class="challenge-description">${escapeHTML(challenge.description)}</p>
+
+                    <div class="challenge-details">
+                        ${locationRestrictionHTML}
+                        ${bonusPointsHTML}
+                        ${requirementsHTML}
+                    </div>
+
+                    ${actionsHTML}
                 </div>
-                
-                <p class="challenge-description">${challenge.description}</p>
-                
-                <div class="challenge-details">
-                    ${locationRestrictionHTML}
-                    ${bonusPointsHTML}
-                    ${requirementsHTML}
-                </div>
-                
-                ${actionsHTML}
             </div>
         `;
+    }
+
+    // Toggle card expanded/collapsed state
+    function toggleCard(cardElement) {
+        // Prevent toggle if clicking on buttons
+        if (event.target.closest('button')) {
+            event.stopPropagation();
+            return;
+        }
+
+        cardElement.classList.toggle('collapsed');
+        cardElement.classList.toggle('expanded');
+    }
+
+    // Set active filter chip
+    function setActiveChip(category) {
+        filterChips.forEach(chip => {
+            if (chip.getAttribute('data-category') === category) {
+                chip.classList.add('active');
+            } else {
+                chip.classList.remove('active');
+            }
+        });
+    }
+
+    // Update chip counts
+    function updateChipCounts() {
+        if (!challengesData || challengesData.length === 0) return;
+
+        const counts = {
+            all: challengesData.length,
+            easy: challengesData.filter(c => c.category === 'easy').length,
+            medium: challengesData.filter(c => c.category === 'medium').length,
+            hard: challengesData.filter(c => c.category === 'hard').length,
+            'location-specific': challengesData.filter(c => c.category === 'location-specific').length
+        };
+
+        document.getElementById('count-all').textContent = `(${counts.all})`;
+        document.getElementById('count-easy').textContent = `(${counts.easy})`;
+        document.getElementById('count-medium').textContent = `(${counts.medium})`;
+        document.getElementById('count-hard').textContent = `(${counts.hard})`;
+        document.getElementById('count-location').textContent = `(${counts['location-specific']})`;
     }
 
     function formatCategoryName(category) {
@@ -375,13 +554,135 @@
     }
 
     // Challenge status management
-    function getChallengeStatus(challengeId) {
-        const inProgress = JSON.parse(localStorage.getItem('challenges_in_progress') || '[]');
-        const completed = JSON.parse(localStorage.getItem('challenges_completed') || '[]');
+    /**
+     * Load team challenges cache from localStorage or Sheets
+     */
+    async function loadTeamChallengesCache(forceRefresh = false) {
+        const teamName = localStorage.getItem('scavenger_team');
 
-        if (completed.includes(challengeId)) return 'completed';
+        if (!teamName) {
+            teamChallengesCache = null;
+            return;
+        }
+
+        // Try to load from localStorage first
+        if (!forceRefresh) {
+            const cached = localStorage.getItem('team_challenges_cache');
+            if (cached) {
+                try {
+                    const cacheData = JSON.parse(cached);
+                    // Check if cache is for the current team
+                    if (cacheData.teamName === teamName) {
+                        teamChallengesCache = cacheData.challenges;
+                        console.log('Loaded team challenges from cache:', teamChallengesCache.length);
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error parsing cache:', e);
+                }
+            }
+        }
+
+        // Fetch from Sheets if no cache or forced refresh
+        try {
+            if (!window.SheetsAPI || !window.SheetsAPI.getTeamChallenges) {
+                console.log('Sheets API not ready yet');
+                return;
+            }
+
+            const token = typeof gapi !== 'undefined' && gapi.client ? gapi.client.getToken() : null;
+            if (!token) {
+                console.log('User not authenticated, skipping cache load');
+                return;
+            }
+
+            console.log('Fetching team challenges from Sheets...');
+            const challenges = await window.SheetsAPI.getTeamChallenges(teamName);
+            teamChallengesCache = challenges;
+
+            // Save to localStorage
+            const cacheData = {
+                teamName: teamName,
+                challenges: challenges,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('team_challenges_cache', JSON.stringify(cacheData));
+            console.log('Cached team challenges:', challenges.length);
+
+            // Refresh display to update completion status
+            displayChallenges();
+        } catch (error) {
+            console.error('Error loading team challenges:', error);
+            teamChallengesCache = null;
+        }
+    }
+
+    /**
+     * Update cache after submission
+     */
+    function updateChallengeInCache(challengeData) {
+        const teamName = localStorage.getItem('scavenger_team');
+        if (!teamName) return;
+
+        if (!teamChallengesCache) {
+            teamChallengesCache = [];
+        }
+
+        // Find existing challenge in cache
+        const existingIndex = teamChallengesCache.findIndex(c => c.challengeId === challengeData.challengeId);
+
+        if (existingIndex >= 0) {
+            // Update existing
+            teamChallengesCache[existingIndex] = challengeData;
+        } else {
+            // Add new
+            teamChallengesCache.push(challengeData);
+        }
+
+        // Save to localStorage
+        const cacheData = {
+            teamName: teamName,
+            challenges: teamChallengesCache,
+            timestamp: Date.now()
+        };
+        localStorage.setItem('team_challenges_cache', JSON.stringify(cacheData));
+        console.log('Updated cache for challenge:', challengeData.challengeId);
+    }
+
+    /**
+     * Clear cache (when switching teams or signing out)
+     */
+    function clearTeamChallengesCache() {
+        teamChallengesCache = null;
+        localStorage.removeItem('team_challenges_cache');
+        console.log('Cleared team challenges cache');
+    }
+
+    /**
+     * Get challenge status from cache
+     */
+    function getChallengeStatus(challengeId) {
+        // Check in-progress from localStorage (still useful for pre-submission state)
+        const inProgress = JSON.parse(localStorage.getItem('challenges_in_progress') || '[]');
+
+        // Check if challenge exists in team challenges cache
+        if (teamChallengesCache) {
+            const challenge = teamChallengesCache.find(c => c.challengeId === challengeId);
+            if (challenge) {
+                return 'completed';
+            }
+        }
+
         if (inProgress.includes(challengeId)) return 'in-progress';
         return 'not-started';
+    }
+
+    /**
+     * Get challenge data from cache
+     */
+    function getChallengeFromCache(challengeId) {
+        if (!teamChallengesCache) return null;
+        return teamChallengesCache.find(c => c.challengeId === challengeId) || null;
     }
 
     function toggleInProgress(challengeId) {
@@ -432,8 +733,8 @@
         modal.innerHTML = `
             <div class="modal-content">
                 <h2>Complete Challenge</h2>
-                <h3>${challenge.title}</h3>
-                
+                <h3>${escapeHTML(challenge.title)}</h3>
+
                 <form id="completion-form">
                     <div class="form-group">
                         <label>Location Coordinates:</label>
@@ -480,7 +781,7 @@
         const submitBtn = modal.querySelector('#submit-btn');
         let capturedLocation = null;
 
-        // Get user location
+        // Get user location (optional)
         try {
             const position = await locationManager.getCurrentLocation();
             capturedLocation = `${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}`;
@@ -488,14 +789,16 @@
                 <span class="location-coords">${capturedLocation}</span>
                 <button type="button" class="btn-refresh" onclick="window.Challenges.refreshLocation(this)">🔄 Refresh</button>
             `;
-            submitBtn.disabled = false;
         } catch (error) {
             console.error('Location error:', error);
             locationInfo.innerHTML = `
-                <span class="location-error">${error.message}</span>
+                <span class="location-warning">⚠️ Location unavailable (optional)</span>
                 <button type="button" class="btn-retry" onclick="window.Challenges.retryLocation(this)">Try Again</button>
             `;
         }
+
+        // Enable submit button regardless of location
+        submitBtn.disabled = false;
 
         // Handle photo selection
         const photoInput = modal.querySelector('#photo-upload');
@@ -518,11 +821,6 @@
         const form = modal.querySelector('#completion-form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            if (!capturedLocation) {
-                alert('Please allow location access to complete the challenge.');
-                return;
-            }
 
             const neighborhoodBonus = parseInt(document.getElementById('neighborhood-bonus').value) || 0;
             const otherBonus = parseInt(document.getElementById('other-bonus').value) || 0;
@@ -572,12 +870,17 @@
                 );
 
                 if (success) {
-                    // Mark as completed locally
-                    const completed = JSON.parse(localStorage.getItem('challenges_completed') || '[]');
-                    if (!completed.includes(challenge.id)) {
-                        completed.push(challenge.id);
-                        localStorage.setItem('challenges_completed', JSON.stringify(completed));
-                    }
+                    // Update cache with new challenge data (write-through)
+                    updateChallengeInCache({
+                        challengeId: challenge.id,
+                        challengeName: challenge.title,
+                        basePoints: challenge.basePoints,
+                        location: capturedLocation || '',
+                        neighborhoodBonus: neighborhoodBonus,
+                        otherBonus: otherBonus,
+                        photoLinks: photoLinks,
+                        notes: notes
+                    });
 
                     // Remove from in-progress
                     const inProgress = JSON.parse(localStorage.getItem('challenges_in_progress') || '[]');
@@ -625,14 +928,16 @@
                 <span class="location-coords">${capturedLocation}</span>
                 <button type="button" class="btn-refresh" onclick="window.Challenges.refreshLocation(this)">🔄 Refresh</button>
             `;
-            submitBtn.disabled = false;
         } catch (error) {
             console.error('Location error:', error);
             locationInfo.innerHTML = `
-                <span class="location-error">${error.message}</span>
+                <span class="location-warning">⚠️ Location unavailable (optional)</span>
                 <button type="button" class="btn-retry" onclick="window.Challenges.retryLocation(this)">Try Again</button>
             `;
         }
+
+        // Enable submit button regardless of location
+        submitBtn.disabled = false;
     }
 
     async function retryLocation(button) {
@@ -648,6 +953,10 @@
         completeChallenge: completeChallenge,
         getChallengeStatus: getChallengeStatus,
         refreshLocation: refreshLocation,
-        retryLocation: retryLocation
+        retryLocation: retryLocation,
+        toggleCard: toggleCard,
+        loadTeamChallengesCache: loadTeamChallengesCache,
+        clearTeamChallengesCache: clearTeamChallengesCache,
+        getChallengeFromCache: getChallengeFromCache
     };
 })();

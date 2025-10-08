@@ -8,8 +8,12 @@ const SHEET_ID = '1RYK0ZPu1ac9xMiwMz-8DCX_loFWleObcN5O0HQzk7iM';
 
 // Google Sheets API configuration
 const CLIENT_ID = '176356314161-475e7q7todmkgrnq2ihks8c9sc9jmk4s.apps.googleusercontent.com'; // Replace with your OAuth 2.0 Client ID
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+// Using drive.file scope for security - only access files created by this app
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file';
+const DISCOVERY_DOCS = [
+    'https://sheets.googleapis.com/$discovery/rest?version=v4',
+    'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'
+];
 
 let tokenClient;
 let gapiInited = false;
@@ -28,10 +32,10 @@ function initializeGoogleAPI() {
 async function initializeGapiClient() {
     try {
         await gapi.client.init({
-            discoveryDocs: [DISCOVERY_DOC],
+            discoveryDocs: DISCOVERY_DOCS,
         });
         gapiInited = true;
-        console.log('Google API client initialized');
+        console.log('Google API client initialized (Sheets + Drive)');
     } catch (err) {
         console.error('Error initializing GAPI client:', err);
     }
@@ -312,12 +316,14 @@ async function calculateTeamScore(teamName) {
     let completedChallenges = 0;
 
     challenges.forEach(row => {
+        const challengeId = row[0] || '';
         const basePoints = parseInt(row[2]) || 0;
         const location = row[3] || '';
         const neighborhoodBonus = parseInt(row[4]) || 0;
         const otherBonus = parseInt(row[5]) || 0;
 
-        if (location) { // Challenge is completed if location is filled
+        // Challenge is completed if it exists in the sheet (has a challengeId)
+        if (challengeId) {
             completedChallenges++;
             totalBasePoints += basePoints;
             totalNeighborhoodBonus += neighborhoodBonus;

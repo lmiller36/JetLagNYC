@@ -31,7 +31,6 @@ function loadSharedNavigation() {
                         <li><a href="${pathPrefix}pages/challenges.html" class="nav-link" data-page="challenges">Challenges</a></li>
                         <li><a href="${pathPrefix}pages/neighborhoods.html" class="nav-link" data-page="neighborhoods">Neighborhoods</a></li>
                         <li><a href="${pathPrefix}pages/team.html" class="nav-link" data-page="team">Team</a></li>
-                        <li><a href="${pathPrefix}pages/submission.html" class="nav-link" data-page="submission">Submit Photos</a></li>
                         <li><a href="${pathPrefix}pages/rules.html" class="nav-link" data-page="rules">Rules</a></li>
                     </ul>
                 </div>

@@ -26,6 +26,20 @@ function loadAllChallenges() {
 }
 
 let currentTeam = null;
+let scoreLoaded = false;
+let challengesLoaded = false;
+
+/**
+ * Escape HTML to prevent XSS attacks
+ * @param {string} str - String to escape
+ * @returns {string} Escaped HTML string
+ */
+function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
 
 /**
  * Initialize team page
@@ -67,17 +81,20 @@ function initTeamPage() {
  * Check initial state with retry logic for API initialization
  */
 function checkInitialState() {
+    // Initial update - just update UI, don't load data yet
     updateTeamUI();
-    
-    // Retry after a delay to catch late API initialization
+
+    // Wait a bit for API to initialize, then load data once
     setTimeout(() => {
-        updateTeamUI();
+        // Only update UI state, loadTeamScore/loadTeamChallenges have their own retry logic
+        const hasToken = typeof gapi !== 'undefined' && gapi?.client?.getToken() !== null;
+        const hasUser = window.Auth && window.Auth.isSignedIn();
+
+        // Update UI one more time after API loads
+        if (hasToken || hasUser) {
+            updateTeamUI();
+        }
     }, 1000);
-    
-    // Final retry
-    setTimeout(() => {
-        updateTeamUI();
-    }, 2000);
 }
 
 /**
@@ -94,6 +111,8 @@ function handleSignIn() {
  */
 function handleSignOut() {
     currentTeam = null;
+    scoreLoaded = false;
+    challengesLoaded = false;
     updateTeamUI();
 }
 
@@ -135,8 +154,16 @@ function updateTeamUI() {
             if (teamNameElement) {
                 teamNameElement.textContent = currentTeam;
             }
-            loadTeamScore();
-            loadTeamChallenges();
+
+            // Only load score/challenges if we have a token and haven't loaded yet
+            if (hasToken) {
+                if (!scoreLoaded) {
+                    loadTeamScore();
+                }
+                if (!challengesLoaded) {
+                    loadTeamChallenges();
+                }
+            }
         } else {
             noTeam.style.display = 'block';
             hasTeam.style.display = 'none';
@@ -229,13 +256,15 @@ async function joinTeam() {
         }
 
         currentTeam = teamName;
+        scoreLoaded = false;
+        challengesLoaded = false;
         localStorage.setItem('scavenger_team', teamName);
         updateTeamUI();
         window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
-        
+
         // Ensure Drive folder exists for joined team
         ensureTeamFolderExists();
-        
+
         alert(`Successfully joined team "${teamName}"!`);
     } catch (err) {
         alert('Error joining team: ' + err.message);
@@ -280,10 +309,8 @@ async function createTeam() {
         }
 
         console.log('Creating new team sheet...');
-        // Load all challenges and create the team sheet
-        const allChallenges = loadAllChallenges();
-        console.log('Loaded challenges:', allChallenges.length);
-        await window.SheetsAPI.initializeTeamSheet(teamName, allChallenges);
+        // Create an empty team sheet (challenges will be added as they're completed)
+        await window.SheetsAPI.initializeTeamSheet(teamName, []);
         
         // Create Google Drive folder for team
         console.log('Creating Google Drive folder for team...');
@@ -299,6 +326,8 @@ async function createTeam() {
         }
         
         currentTeam = teamName;
+        scoreLoaded = false;
+        challengesLoaded = false;
         localStorage.setItem('scavenger_team', teamName);
         updateTeamUI();
         window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
@@ -315,6 +344,8 @@ async function createTeam() {
 function leaveTeam() {
     if (confirm('Are you sure you want to leave this team?')) {
         currentTeam = null;
+        scoreLoaded = false;
+        challengesLoaded = false;
         localStorage.removeItem('scavenger_team');
         updateTeamUI();
         window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName: null } }));
@@ -324,15 +355,56 @@ function leaveTeam() {
 /**
  * Load and display team score
  */
-async function loadTeamScore() {
+async function loadTeamScore(retryCount = 0) {
     if (!currentTeam) return;
 
     const scoreDisplay = document.getElementById('scoreDisplay');
-    scoreDisplay.innerHTML = '<div class="score-loading">Loading score...</div>';
+
+    // Show loading state
+    if (retryCount === 0) {
+        scoreDisplay.innerHTML = `
+            <div class="score-loading">
+                <div class="loading-spinner"></div>
+                <p>Loading score...</p>
+            </div>
+        `;
+    }
+
+    // Check if API is ready
+    if (!window.SheetsAPI || !window.SheetsAPI.calculateTeamScore) {
+        if (retryCount < 5) {
+            // Retry after delay (max 5 attempts)
+            setTimeout(() => loadTeamScore(retryCount + 1), 1000);
+        } else {
+            scoreDisplay.innerHTML = `
+                <div class="score-error">
+                    <p>⚠️ API not ready</p>
+                    <button onclick="window.Team.loadTeamScore()" class="btn btn-secondary">Try Again</button>
+                </div>
+            `;
+        }
+        return;
+    }
+
+    // Check if user is authenticated
+    const token = typeof gapi !== 'undefined' && gapi.client ? gapi.client.getToken() : null;
+    if (!token) {
+        if (retryCount < 5) {
+            // Retry after delay in case token is still loading
+            setTimeout(() => loadTeamScore(retryCount + 1), 1000);
+        } else {
+            scoreDisplay.innerHTML = `
+                <div class="score-loading">
+                    <p>Please sign in to view your score</p>
+                </div>
+            `;
+        }
+        return;
+    }
 
     try {
         const score = await window.SheetsAPI.calculateTeamScore(currentTeam);
-        
+
         scoreDisplay.innerHTML = `
             <div class="score-item">
                 <span class="score-label">Completed Challenges:</span>
@@ -352,31 +424,83 @@ async function loadTeamScore() {
             </div>
             <div class="total-score">${score.totalScore} Total Points</div>
         `;
+
+        // Mark as loaded
+        scoreLoaded = true;
     } catch (err) {
-        scoreDisplay.innerHTML = '<div class="score-loading">Error loading score</div>';
         console.error('Error loading score:', err);
+        scoreDisplay.innerHTML = `
+            <div class="score-error">
+                <p>⚠️ Could not load score</p>
+                <p class="error-detail">${err.message}</p>
+                <button onclick="window.Team.loadTeamScore()" class="btn btn-secondary">Try Again</button>
+            </div>
+        `;
     }
 }
 
 /**
  * Load and display team challenges
  */
-async function loadTeamChallenges() {
+async function loadTeamChallenges(retryCount = 0) {
     if (!currentTeam) return;
 
     const progressDiv = document.getElementById('challengeProgress');
-    progressDiv.innerHTML = '<div class="score-loading">Loading challenges...</div>';
+
+    // Show loading state
+    if (retryCount === 0) {
+        progressDiv.innerHTML = `
+            <div class="score-loading">
+                <div class="loading-spinner"></div>
+                <p>Loading challenges...</p>
+            </div>
+        `;
+    }
+
+    // Check if API is ready
+    if (!window.SheetsAPI || !window.SheetsAPI.getTeamChallenges) {
+        if (retryCount < 5) {
+            setTimeout(() => loadTeamChallenges(retryCount + 1), 1000);
+        } else {
+            progressDiv.innerHTML = `
+                <div class="score-error">
+                    <p>⚠️ API not ready</p>
+                </div>
+            `;
+        }
+        return;
+    }
+
+    // Check if user is authenticated
+    const token = typeof gapi !== 'undefined' && gapi.client ? gapi.client.getToken() : null;
+    if (!token) {
+        if (retryCount < 5) {
+            setTimeout(() => loadTeamChallenges(retryCount + 1), 1000);
+        } else {
+            progressDiv.innerHTML = `
+                <div class="score-loading">
+                    <p>Please sign in to view challenges</p>
+                </div>
+            `;
+        }
+        return;
+    }
 
     try {
         const challenges = await window.SheetsAPI.getTeamChallenges(currentTeam);
-        
+
+        if (challenges.length === 0) {
+            progressDiv.innerHTML = '<div class="score-loading"><p>No challenges yet. Complete some challenges to see them here!</p></div>';
+            return;
+        }
+
         progressDiv.innerHTML = challenges.map(challenge => {
-            const isCompleted = challenge.location !== '';
+            const isCompleted = challenge.challengeId !== '';
             const totalPoints = challenge.basePoints + challenge.neighborhoodBonus + challenge.otherBonus;
-            
+
             return `
                 <div class="challenge-item ${isCompleted ? 'completed' : ''}">
-                    <span class="challenge-name">${challenge.challengeName}</span>
+                    <span class="challenge-name">${escapeHTML(challenge.challengeName)}</span>
                     <div class="challenge-status">
                         ${isCompleted ? `<span>${totalPoints} pts</span>` : `<span>${challenge.basePoints} base pts</span>`}
                         <span class="status-badge ${isCompleted ? 'completed' : 'pending'}">
@@ -386,9 +510,17 @@ async function loadTeamChallenges() {
                 </div>
             `;
         }).join('');
+
+        // Mark as loaded
+        challengesLoaded = true;
     } catch (err) {
-        progressDiv.innerHTML = '<div class="score-loading">Error loading challenges</div>';
         console.error('Error loading challenges:', err);
+        progressDiv.innerHTML = `
+            <div class="score-error">
+                <p>⚠️ Could not load challenges</p>
+                <p class="error-detail">${err.message}</p>
+            </div>
+        `;
     }
 }
 

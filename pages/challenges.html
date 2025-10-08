@@ -20,24 +20,48 @@
 
         <section class="challenges-section">
             <div class="container">
-                <!-- Search and Filter Controls -->
-                <div class="search-filter-container">
-                    <div class="search-box">
-                        <input type="text" id="challenge-search" placeholder="Search challenges..." aria-label="Search challenges">
-                    </div>
-                    
-                    <div class="filter-controls">
-                        <div class="filter-group">
-                            <label for="category-filter">Category:</label>
-                            <select id="category-filter" aria-label="Filter by category">
-                                <option value="all">All Categories</option>
-                                <option value="easy">Easy</option>
-                                <option value="medium">Medium</option>
-                                <option value="hard">Hard</option>
-                                <option value="location-specific">Location-Specific</option>
-                            </select>
+                <!-- Sticky Filter Chips Bar -->
+                <div class="filter-chips-sticky">
+                    <button class="chip-search" id="search-toggle" aria-label="Toggle search">
+                        <span class="search-icon">🔍</span>
+                    </button>
+
+                    <div class="chips-container">
+                        <div class="chips-scroll" id="category-chips">
+                            <button class="filter-chip active" data-category="all">
+                                All <span class="chip-count" id="count-all">(0)</span>
+                            </button>
+                            <button class="filter-chip" data-category="easy">
+                                Easy <span class="chip-count" id="count-easy">(0)</span>
+                            </button>
+                            <button class="filter-chip" data-category="medium">
+                                Medium <span class="chip-count" id="count-medium">(0)</span>
+                            </button>
+                            <button class="filter-chip" data-category="hard">
+                                Hard <span class="chip-count" id="count-hard">(0)</span>
+                            </button>
+                            <button class="filter-chip" data-category="location-specific">
+                                Location <span class="chip-count" id="count-location">(0)</span>
+                            </button>
                         </div>
-                        
+                    </div>
+
+                    <button class="chip-more" id="more-filters" aria-label="More filters">
+                        <span class="more-icon">⚙️</span>
+                    </button>
+                </div>
+
+                <!-- Search Box (Initially Hidden) -->
+                <div class="search-box-expandable" id="search-box" style="display: none;">
+                    <input type="text" id="challenge-search" placeholder="Search challenges..." aria-label="Search challenges">
+                    <button class="search-close" id="search-close" aria-label="Close search">×</button>
+                </div>
+
+                <!-- More Filters Panel (Initially Hidden) -->
+                <div class="more-filters-panel" id="more-filters-panel" style="display: none;">
+                    <div class="filter-panel-content">
+                        <h3>Additional Filters</h3>
+
                         <div class="filter-group">
                             <label for="points-sort">Sort by Points:</label>
                             <select id="points-sort" aria-label="Sort by points">
@@ -46,7 +70,7 @@
                                 <option value="points-desc">Points: High to Low</option>
                             </select>
                         </div>
-                        
+
                         <div class="filter-group">
                             <label for="completion-filter">Status:</label>
                             <select id="completion-filter" aria-label="Filter by completion status">
@@ -55,14 +79,20 @@
                                 <option value="completed">Completed Only</option>
                             </select>
                         </div>
-                        
-                        <button id="clear-filters" class="btn btn-secondary">Clear Filters</button>
+
+                        <div class="filter-panel-actions">
+                            <button id="clear-filters" class="btn btn-secondary">Clear All</button>
+                            <button id="apply-filters" class="btn btn-primary">Apply</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Results Summary -->
                 <div class="results-summary">
                     <p id="results-count">Loading challenges...</p>
+                    <button id="refresh-status-btn" class="btn-refresh-status" title="Refresh completion status from Google Sheets">
+                        🔄 Refresh Status
+                    </button>
                 </div>
 
                 <!-- Challenges Grid -->

@@ -228,6 +228,18 @@ function signOut() {
 }
 
 /**
+ * Escape HTML to prevent XSS attacks
+ * @param {string} str - String to escape
+ * @returns {string} Escaped HTML string
+ */
+function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/**
  * Update UI based on auth state
  */
 function updateUserUI() {
@@ -238,8 +250,8 @@ function updateUserUI() {
     userInfoElements.forEach(element => {
         if (currentUser) {
             element.innerHTML = `
-                <img src="${currentUser.picture}" alt="${currentUser.name}" class="user-avatar">
-                <span class="user-name">${currentUser.name}</span>
+                <img src="${escapeHTML(currentUser.picture)}" alt="${escapeHTML(currentUser.name)}" class="user-avatar">
+                <span class="user-name">${escapeHTML(currentUser.name)}</span>
                 <button onclick="window.Auth.signOut()" class="sign-out-btn">Sign Out</button>
             `;
         } else {
