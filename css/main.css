@@ -557,3 +557,54 @@ User Info Styles */
         display: none;
     }
 }
+
+/* Team Info Styles */
+.team-info {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.team-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 12px;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+}
+
+.team-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.team-name {
+    color: var(--white);
+    font-weight: 600;
+}
+
+.team-score {
+    color: var(--warning-color);
+    font-weight: 700;
+    margin-left: 4px;
+}
+
+@media (max-width: 768px) {
+    .team-info {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .team-display {
+        font-size: var(--font-size-xs);
+        padding: 4px 8px;
+        gap: 6px;
+    }
+    
+    .team-label {
+        display: none;
+    }
+}

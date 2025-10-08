@@ -211,9 +211,9 @@ async function handleAuthComplete() {
 function signOut() {
     window.SheetsAPI.handleSignoutClick();
     currentUser = null;
-    localStorage.removeItem('scavenger_user');
-    localStorage.removeItem('scavenger_team');
-    localStorage.removeItem('scavenger_token');
+    
+    // Clear all localStorage
+    localStorage.clear();
 
     // Clear token refresh timer
     if (tokenExpirationTimer) {

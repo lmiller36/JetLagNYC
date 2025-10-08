@@ -47,8 +47,28 @@ function initTeamPage() {
     window.addEventListener('userSignedIn', handleSignIn);
     window.addEventListener('userSignedOut', handleSignOut);
 
-    // Check initial state
+    // Load saved team from localStorage on page load
+    loadSavedTeam();
+    
+    // Check initial state and update UI
+    checkInitialState();
+}
+
+/**
+ * Check initial state with retry logic for API initialization
+ */
+function checkInitialState() {
     updateTeamUI();
+    
+    // Retry after a delay to catch late API initialization
+    setTimeout(() => {
+        updateTeamUI();
+    }, 1000);
+    
+    // Final retry
+    setTimeout(() => {
+        updateTeamUI();
+    }, 2000);
 }
 
 /**
@@ -77,15 +97,18 @@ function updateTeamUI() {
     const hasTeam = document.getElementById('hasTeam');
 
     // Check if we have both user info AND a valid token
-    const hasToken = gapi?.client?.getToken() !== null;
-    const isSignedIn = window.Auth.isSignedIn() && hasToken;
+    const hasToken = typeof gapi !== 'undefined' && gapi?.client?.getToken() !== null;
+    const hasUser = window.Auth && window.Auth.isSignedIn();
+    const isSignedIn = hasUser && hasToken;
+
+    console.log('updateTeamUI - hasUser:', hasUser, 'hasToken:', hasToken, 'currentTeam:', currentTeam);
 
     if (!isSignedIn) {
         notLoggedIn.style.display = 'block';
         teamManagement.style.display = 'none';
         
         // Update message if user info exists but token is missing
-        if (window.Auth.isSignedIn() && !hasToken) {
+        if (hasUser && !hasToken) {
             const authPrompt = notLoggedIn.querySelector('h3');
             if (authPrompt) {
                 authPrompt.textContent = 'Your session expired. Please sign in again.';
@@ -98,7 +121,10 @@ function updateTeamUI() {
         if (currentTeam) {
             noTeam.style.display = 'none';
             hasTeam.style.display = 'block';
-            document.getElementById('currentTeamName').textContent = currentTeam;
+            const teamNameElement = document.getElementById('currentTeamName');
+            if (teamNameElement) {
+                teamNameElement.textContent = currentTeam;
+            }
             loadTeamScore();
             loadTeamChallenges();
         } else {
@@ -113,9 +139,15 @@ function updateTeamUI() {
  */
 function loadSavedTeam() {
     const savedTeam = localStorage.getItem('scavenger_team');
+    console.log('Loading saved team from localStorage:', savedTeam);
     if (savedTeam) {
         currentTeam = savedTeam;
-        updateTeamUI();
+        console.log('Set currentTeam to:', currentTeam);
+        // Don't call updateTeamUI here - let checkInitialState handle it
+        // This prevents double-loading
+        
+        // Notify other components that team is loaded (for navigation bar)
+        window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName: savedTeam } }));
     }
 }
 
@@ -140,6 +172,7 @@ async function joinTeam() {
         currentTeam = teamName;
         localStorage.setItem('scavenger_team', teamName);
         updateTeamUI();
+        window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
         alert(`Successfully joined team "${teamName}"!`);
     } catch (err) {
         alert('Error joining team: ' + err.message);
@@ -177,6 +210,7 @@ async function createTeam() {
                 currentTeam = teamName;
                 localStorage.setItem('scavenger_team', teamName);
                 updateTeamUI();
+                window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
                 alert(`Successfully joined team "${teamName}"!`);
             }
             return;
@@ -189,6 +223,7 @@ async function createTeam() {
         currentTeam = teamName;
         localStorage.setItem('scavenger_team', teamName);
         updateTeamUI();
+        window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
         alert(`Successfully created team "${teamName}"!`);
     } catch (err) {
         alert('Error creating team: ' + err.message);
@@ -204,6 +239,7 @@ function leaveTeam() {
         currentTeam = null;
         localStorage.removeItem('scavenger_team');
         updateTeamUI();
+        window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName: null } }));
     }
 }
 
