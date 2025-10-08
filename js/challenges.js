@@ -13,6 +13,7 @@
     let searchInput;
     let categoryFilter;
     let pointsSort;
+    let completionFilter;
     let clearFiltersBtn;
     let challengesContainer;
     let resultsCount;
@@ -28,6 +29,7 @@
         searchInput = document.getElementById('challenge-search');
         categoryFilter = document.getElementById('category-filter');
         pointsSort = document.getElementById('points-sort');
+        completionFilter = document.getElementById('completion-filter');
         clearFiltersBtn = document.getElementById('clear-filters');
         challengesContainer = document.getElementById('challenges-container');
         resultsCount = document.getElementById('results-count');
@@ -56,6 +58,10 @@
 
         if (pointsSort) {
             pointsSort.addEventListener('change', filterChallenges);
+        }
+
+        if (completionFilter) {
+            completionFilter.addEventListener('change', filterChallenges);
         }
 
         if (clearFiltersBtn) {
@@ -129,6 +135,7 @@
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
         const selectedCategory = categoryFilter ? categoryFilter.value : 'all';
         const sortOrder = pointsSort ? pointsSort.value : 'default';
+        const completionStatus = completionFilter ? completionFilter.value : 'all';
 
         // Start with all challenges
         filteredChallenges = [...challengesData];
@@ -148,6 +155,19 @@
             filteredChallenges = filteredChallenges.filter(challenge =>
                 challenge.category === selectedCategory
             );
+        }
+
+        // Apply completion status filter
+        if (completionStatus !== 'all') {
+            filteredChallenges = filteredChallenges.filter(challenge => {
+                const status = getChallengeStatus(challenge.id);
+                if (completionStatus === 'completed') {
+                    return status === 'completed';
+                } else if (completionStatus === 'not-completed') {
+                    return status !== 'completed';
+                }
+                return true;
+            });
         }
 
         // Apply sorting
@@ -307,6 +327,7 @@
         if (searchInput) searchInput.value = '';
         if (categoryFilter) categoryFilter.value = 'all';
         if (pointsSort) pointsSort.value = 'default';
+        if (completionFilter) completionFilter.value = 'all';
 
         filterChallenges();
     }
