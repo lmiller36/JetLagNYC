@@ -423,7 +423,10 @@
         showCompletionModal(challenge, teamName);
     }
 
-    function showCompletionModal(challenge, teamName) {
+    async function showCompletionModal(challenge, teamName) {
+        // Initialize location manager
+        const locationManager = new window.LocationManager();
+        
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.innerHTML = `
@@ -433,8 +436,10 @@
                 
                 <form id="completion-form">
                     <div class="form-group">
-                        <label for="location">Location Completed:</label>
-                        <input type="text" id="location" required placeholder="e.g., Central Park, Brooklyn Bridge">
+                        <label>Location Coordinates:</label>
+                        <div id="location-info" class="location-info">
+                            <span class="location-status">Getting location...</span>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -458,7 +463,7 @@
                     </div>
                     
                     <div class="modal-actions">
-                        <button type="submit" class="btn btn-primary">Submit to Google Sheets</button>
+                        <button type="submit" class="btn btn-primary" id="submit-btn" disabled>Submit to Google Sheets</button>
                         <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
                     </div>
                 </form>
@@ -467,11 +472,36 @@
 
         document.body.appendChild(modal);
 
+        const locationInfo = modal.querySelector('#location-info');
+        const submitBtn = modal.querySelector('#submit-btn');
+        let capturedLocation = null;
+
+        // Get user location
+        try {
+            const position = await locationManager.getCurrentLocation();
+            capturedLocation = `${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}`;
+            locationInfo.innerHTML = `
+                <span class="location-coords">${capturedLocation}</span>
+                <button type="button" class="btn-refresh" onclick="window.Challenges.refreshLocation(this)">🔄 Refresh</button>
+            `;
+            submitBtn.disabled = false;
+        } catch (error) {
+            console.error('Location error:', error);
+            locationInfo.innerHTML = `
+                <span class="location-error">${error.message}</span>
+                <button type="button" class="btn-retry" onclick="window.Challenges.retryLocation(this)">Try Again</button>
+            `;
+        }
+
         const form = modal.querySelector('#completion-form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const location = document.getElementById('location').value;
+            if (!capturedLocation) {
+                alert('Please allow location access to complete the challenge.');
+                return;
+            }
+
             const neighborhoodBonus = parseInt(document.getElementById('neighborhood-bonus').value) || 0;
             const otherBonus = parseInt(document.getElementById('other-bonus').value) || 0;
             const photoLinks = document.getElementById('photo-links').value;
@@ -483,7 +513,7 @@
                     teamName, 
                     challenge.title, 
                     {
-                        location,
+                        location: capturedLocation,
                         neighborhoodBonus,
                         otherBonus,
                         photoLinks,
@@ -523,6 +553,43 @@
                 alert('Error uploading to Google Sheets: ' + error.message);
             }
         });
+
+        // Store modal reference for location refresh
+        modal._locationManager = locationManager;
+        modal._capturedLocationRef = () => capturedLocation;
+        modal._setCapturedLocation = (loc) => { capturedLocation = loc; };
+    }
+
+    // Helper functions for location refresh/retry
+    async function refreshLocation(button) {
+        const modal = button.closest('.modal-overlay');
+        const locationInfo = modal.querySelector('#location-info');
+        const submitBtn = modal.querySelector('#submit-btn');
+        const locationManager = modal._locationManager;
+
+        locationInfo.innerHTML = '<span class="location-status">Getting location...</span>';
+        submitBtn.disabled = true;
+
+        try {
+            const position = await locationManager.getCurrentLocation();
+            const capturedLocation = `${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}`;
+            modal._setCapturedLocation(capturedLocation);
+            locationInfo.innerHTML = `
+                <span class="location-coords">${capturedLocation}</span>
+                <button type="button" class="btn-refresh" onclick="window.Challenges.refreshLocation(this)">🔄 Refresh</button>
+            `;
+            submitBtn.disabled = false;
+        } catch (error) {
+            console.error('Location error:', error);
+            locationInfo.innerHTML = `
+                <span class="location-error">${error.message}</span>
+                <button type="button" class="btn-retry" onclick="window.Challenges.retryLocation(this)">Try Again</button>
+            `;
+        }
+    }
+
+    async function retryLocation(button) {
+        await refreshLocation(button);
     }
 
     // Expose functions for potential external use
@@ -532,6 +599,8 @@
         loadChallengesData: loadChallengesData,
         toggleInProgress: toggleInProgress,
         completeChallenge: completeChallenge,
-        getChallengeStatus: getChallengeStatus
+        getChallengeStatus: getChallengeStatus,
+        refreshLocation: refreshLocation,
+        retryLocation: retryLocation
     };
 })();

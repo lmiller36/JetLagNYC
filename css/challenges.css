@@ -458,6 +458,63 @@ Challenge actions */
     flex: 1;
 }
 
+/* Location info styles */
+.location-info {
+    padding: var(--spacing-md);
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    border: 2px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.location-status {
+    color: var(--secondary-color);
+    font-style: italic;
+}
+
+.location-coords {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: var(--font-size-base);
+}
+
+.location-error {
+    color: var(--danger-color);
+    font-size: var(--font-size-sm);
+}
+
+.btn-refresh,
+.btn-retry {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-refresh:hover,
+.btn-retry:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-retry {
+    background-color: var(--warning-color);
+    color: var(--dark-color);
+}
+
+.btn-retry:hover {
+    background-color: #e0a800;
+}
+
 /* Responsive modal */
 @media (max-width: 767px) {
     .modal-content {
@@ -470,5 +527,10 @@ Challenge actions */
     
     .modal-actions .btn {
         width: 100%;
+    }
+    
+    .location-info {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
