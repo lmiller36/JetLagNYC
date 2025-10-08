@@ -2,7 +2,7 @@
 
 /* Page header */
 .page-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); /* Blue to Orange */
     color: var(--white);
     padding: var(--spacing-xl) 0;
     text-align: center;
@@ -28,14 +28,22 @@
 .filter-chips-sticky {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 50; /* Lower than nav menu */
     background-color: var(--white);
-    padding: var(--spacing-md) 0;
-    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    margin: 0 calc(-1 * var(--spacing-md)) var(--spacing-lg); /* Extend to edges on mobile */
     border-bottom: 2px solid var(--light-color);
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 768px) {
+    .filter-chips-sticky {
+        margin: 0 0 var(--spacing-lg);
+        padding: var(--spacing-md) 0;
+    }
 }
 
 .chip-search,
@@ -72,11 +80,49 @@
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: thin; /* Show thin scrollbar on Firefox */
+    scrollbar-color: var(--primary-color) var(--light-color);
+    position: relative;
 }
 
+/* Show scrollbar on mobile for better UX */
 .chips-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    height: 4px;
+}
+
+.chips-container::-webkit-scrollbar-track {
+    background: var(--light-color);
+}
+
+.chips-container::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+/* Add gradient hints for scrollability */
+.chips-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to left, var(--white), transparent);
+    pointer-events: none;
+}
+
+@media (min-width: 768px) {
+    .chips-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .chips-container {
+        scrollbar-width: none;
+    }
+
+    .chips-container::after {
+        display: none;
+    }
 }
 
 .chips-scroll {
@@ -313,11 +359,11 @@
 
 /* Challenge card */
 .challenge-card {
-    background-color: var(--white);
+    background-color: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     transition: all 0.3s ease;
-    border-left: 4px solid var(--primary-color);
+    border-left: 4px solid var(--secondary-color); /* Orange accent */
     overflow: hidden;
 }
 
@@ -366,19 +412,19 @@
 }
 
 .category-icon.easy {
-    background-color: #e3f2fd;
+    background-color: #C8E6C9; /* Green 100 */
 }
 
 .category-icon.medium {
-    background-color: #fff3e0;
+    background-color: #FFE0B2; /* Orange 100 */
 }
 
 .category-icon.hard {
-    background-color: #ffebee;
+    background-color: #FFCDD2; /* Red 100 */
 }
 
 .category-icon.location-specific {
-    background-color: #f3e5f5;
+    background-color: #BBDEFB; /* Blue 100 */
 }
 
 .preview-content {
@@ -401,7 +447,8 @@
 
 .preview-snippet {
     font-size: var(--font-size-base);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.7;
     margin: 0;
     line-height: 1.5;
     /* Allow description to wrap to 2 lines */
@@ -419,7 +466,7 @@
 }
 
 .points-badge {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color); /* Coral */
     color: var(--white);
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--border-radius);
@@ -429,7 +476,8 @@
 }
 
 .expand-icon {
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.5;
     font-size: 16px;
     transition: transform 0.3s ease;
 }
@@ -482,7 +530,7 @@
 }
 
 .challenge-points {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color); /* Coral */
     color: var(--white);
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--border-radius);
@@ -502,29 +550,32 @@
     margin-bottom: var(--spacing-md);
 }
 
+/* Material Design category colors */
+.category-easy,
 .category-general {
-    background-color: #e3f2fd;
-    color: #1565c0;
+    background-color: #C8E6C9; /* Green 100 */
+    color: #2E7D32; /* Green 800 */
 }
 
 .category-medium {
-    background-color: #fff3e0;
-    color: #ef6c00;
+    background-color: #FFE0B2; /* Orange 100 */
+    color: #E65100; /* Orange 900 */
 }
 
 .category-hard {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color: #FFCDD2; /* Red 100 */
+    color: #C62828; /* Red 800 */
 }
 
 .category-location-specific {
-    background-color: #f3e5f5;
-    color: #7b1fa2;
+    background-color: #BBDEFB; /* Blue 100 */
+    color: #1565C0; /* Blue 800 */
 }
 
 .challenge-description {
     font-size: var(--font-size-base);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.8;
     margin-bottom: var(--spacing-lg);
     line-height: 1.6;
 }
@@ -591,7 +642,8 @@
 .challenge-requirements li {
     padding: var(--spacing-xs) 0;
     font-size: var(--font-size-sm);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.8;
     position: relative;
     padding-left: var(--spacing-lg);
 }
@@ -608,7 +660,8 @@
 .no-results {
     text-align: center;
     padding: var(--spacing-2xl);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.7;
 }
 
 .no-results h3 {
@@ -620,7 +673,8 @@
 .loading {
     text-align: center;
     padding: var(--spacing-2xl);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.7;
 }
 
 /* Responsive design */
@@ -709,13 +763,13 @@ Challenge actions */
 
 /* Challenge status states */
 .challenge-card.in-progress {
-    border-left-color: var(--warning-color);
-    background-color: #fffbf0;
+    border-left-color: var(--warning-color); /* Sunny yellow */
+    background-color: #FFFDE7; /* Light yellow tint */
 }
 
 .challenge-card.completed {
-    border-left-color: var(--success-color);
-    background-color: #f0f9f4;
+    border-left-color: var(--success-color); /* Fresh green */
+    background-color: #F1F8E9; /* Light green tint */
     opacity: 0.85;
 }
 
@@ -822,6 +876,79 @@ Challenge actions */
 .location-status {
     color: var(--secondary-color);
     font-style: italic;
+}
+
+/* Photo preview styles */
+.photo-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.photo-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--light-color);
+    border: 2px solid #ddd;
+}
+
+.photo-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-preview-item .remove-photo {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: rgba(220, 53, 69, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.photo-preview-item .remove-photo:hover {
+    background-color: rgb(220, 53, 69);
+}
+
+.photo-preview-item .photo-link {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background-color: rgba(0, 123, 255, 0.9);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.photo-preview-item .photo-link:hover {
+    background-color: rgb(0, 123, 255);
+}
+
+.photo-count {
+    padding: var(--spacing-sm);
+    background-color: var(--success-color);
+    color: white;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-weight: 600;
 }
 
 .location-coords {

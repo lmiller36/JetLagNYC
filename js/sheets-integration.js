@@ -205,6 +205,14 @@ async function updateTeamChallenge(teamName, rowNumber, challengeData) {
  * @param {Object} updateData - Data to update (location, bonuses, photos, notes)
  * @returns {Promise<boolean>} True if found and updated, false otherwise
  */
+/**
+ * Convert photo links to clickable format for Google Sheets
+ * Just keep raw URLs - they become clickable automatically in Sheets
+ */
+function formatPhotoLinksForSheets(photoLinks) {
+    return photoLinks || '';
+}
+
 async function updateChallengeByName(teamName, challengeName, updateData) {
     const challenges = await readSheetData(`${teamName}!A2:H`);
 
@@ -218,7 +226,7 @@ async function updateChallengeByName(teamName, challengeName, updateData) {
                 updateData.location || challenges[i][3] || '',
                 updateData.neighborhoodBonus !== undefined ? updateData.neighborhoodBonus : (challenges[i][4] || 0),
                 updateData.otherBonus !== undefined ? updateData.otherBonus : (challenges[i][5] || 0),
-                updateData.photoLinks || challenges[i][6] || '',
+                formatPhotoLinksForSheets(updateData.photoLinks) || challenges[i][6] || '',
                 updateData.notes || challenges[i][7] || ''
             ];
 

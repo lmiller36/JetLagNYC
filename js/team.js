@@ -243,7 +243,7 @@ async function ensureTeamFolderExists(retryCount = 0) {
 async function joinTeam() {
     const teamName = document.getElementById('joinTeamName').value.trim();
     if (!teamName) {
-        alert('Please enter a team name');
+        window.toast.warning('Please enter a team name');
         return;
     }
 
@@ -251,7 +251,7 @@ async function joinTeam() {
         // Check if team exists
         const exists = await window.SheetsAPI.sheetExists(teamName);
         if (!exists) {
-            alert(`Team "${teamName}" does not exist. Please check the spelling or create a new team.`);
+            window.toast.error(`Team "${teamName}" does not exist. Please check the spelling or create a new team.`);
             return;
         }
 
@@ -265,9 +265,9 @@ async function joinTeam() {
         // Ensure Drive folder exists for joined team
         ensureTeamFolderExists();
 
-        alert(`Successfully joined team "${teamName}"!`);
+        window.toast.success(`Successfully joined team "${teamName}"!`);
     } catch (err) {
-        alert('Error joining team: ' + err.message);
+        window.toast.error('Error joining team: ' + err.message);
         console.error(err);
     }
 }
@@ -278,32 +278,35 @@ async function joinTeam() {
 async function createTeam() {
     const teamName = document.getElementById('createTeamName').value.trim();
     if (!teamName) {
-        alert('Please enter a team name');
+        window.toast.warning('Please enter a team name');
         return;
     }
 
     // Check if authenticated
     const token = gapi.client.getToken();
     if (!token) {
-        alert('Please sign in with Google first before creating a team.');
+        window.toast.error('Please sign in with Google first before creating a team.');
         return;
     }
 
     try {
         console.log('Checking if team exists:', teamName);
-        
+
         // Check if team already exists
         const exists = await window.SheetsAPI.sheetExists(teamName);
         console.log('Team exists?', exists);
-        
+
         if (exists) {
-            const confirmJoin = confirm(`Team "${teamName}" already exists. Would you like to join it instead?`);
+            const confirmJoin = await window.toast.confirm(
+                `Team "${teamName}" already exists. Would you like to join it instead?`,
+                { confirmText: 'Join Team', cancelText: 'Cancel' }
+            );
             if (confirmJoin) {
                 currentTeam = teamName;
                 localStorage.setItem('scavenger_team', teamName);
                 updateTeamUI();
                 window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
-                alert(`Successfully joined team "${teamName}"!`);
+                window.toast.success(`Successfully joined team "${teamName}"!`);
             }
             return;
         }
@@ -311,7 +314,7 @@ async function createTeam() {
         console.log('Creating new team sheet...');
         // Create an empty team sheet (challenges will be added as they're completed)
         await window.SheetsAPI.initializeTeamSheet(teamName, []);
-        
+
         // Create Google Drive folder for team
         console.log('Creating Google Drive folder for team...');
         try {
@@ -322,18 +325,18 @@ async function createTeam() {
         } catch (driveError) {
             console.error('Error creating Drive folder:', driveError);
             // Don't fail team creation if Drive folder fails
-            alert(`Team created successfully, but there was an issue creating the Google Drive folder: ${driveError.message}`);
+            window.toast.warning(`Team created successfully, but there was an issue creating the Google Drive folder: ${driveError.message}`, 7000);
         }
-        
+
         currentTeam = teamName;
         scoreLoaded = false;
         challengesLoaded = false;
         localStorage.setItem('scavenger_team', teamName);
         updateTeamUI();
         window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName } }));
-        alert(`Successfully created team "${teamName}"!`);
+        window.toast.success(`Successfully created team "${teamName}"!`);
     } catch (err) {
-        alert('Error creating team: ' + err.message);
+        window.toast.error('Error creating team: ' + err.message);
         console.error('Full error:', err);
     }
 }
@@ -341,14 +344,20 @@ async function createTeam() {
 /**
  * Leave current team
  */
-function leaveTeam() {
-    if (confirm('Are you sure you want to leave this team?')) {
+async function leaveTeam() {
+    const confirmed = await window.toast.confirm(
+        'Are you sure you want to leave this team?',
+        { confirmText: 'Leave Team', cancelText: 'Cancel', danger: true }
+    );
+
+    if (confirmed) {
         currentTeam = null;
         scoreLoaded = false;
         challengesLoaded = false;
         localStorage.removeItem('scavenger_team');
         updateTeamUI();
         window.dispatchEvent(new CustomEvent('teamChanged', { detail: { teamName: null } }));
+        window.toast.info('You have left the team');
     }
 }
 

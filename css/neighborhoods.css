@@ -2,7 +2,7 @@
 
 /* Page header */
 .page-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); /* Blue to Orange gradient */
     color: var(--white);
     padding: var(--spacing-xl) 0;
     text-align: center;
@@ -35,7 +35,8 @@
 .scoring-description {
     text-align: center;
     font-size: var(--font-size-lg);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.7;
     margin-bottom: var(--spacing-xl);
 }
 
@@ -65,7 +66,8 @@
     font-size: var(--font-size-lg);
     font-weight: bold;
     margin-bottom: var(--spacing-sm);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.6;
 }
 
 .final-points {
@@ -77,7 +79,8 @@
 
 .scoring-card p:last-child {
     margin: 0;
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.7;
 }
 
 .distance-close {
@@ -335,7 +338,7 @@
 }
 
 .borough-header {
-    background: linear-gradient(135deg, var(--secondary-color), #495057);
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark)); /* Orange gradient */
     color: var(--white);
     padding: var(--spacing-lg);
     border-radius: var(--border-radius);
@@ -422,7 +425,8 @@
 
 .base-points-display {
     font-size: var(--font-size-sm);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.6;
     margin: 0;
 }
 
@@ -471,7 +475,8 @@
 
 .area-tag {
     background-color: var(--light-color);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.8;
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--border-radius);
     font-size: var(--font-size-xs);
@@ -482,7 +487,8 @@
 .loading {
     text-align: center;
     padding: var(--spacing-2xl);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.7;
 }
 
 .error {

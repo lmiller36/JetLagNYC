@@ -136,7 +136,7 @@ function showReauthMessage() {
             element.innerHTML = `
                 <img src="${currentUser.picture}" alt="${currentUser.name}" class="user-avatar" style="opacity: 0.5;">
                 <span class="user-name" style="opacity: 0.5;">${currentUser.name}</span>
-                <button onclick="window.Auth.signIn()" class="sign-out-btn" style="background: #ffc107; color: #000;">Re-authenticate</button>
+                <button onclick="window.Auth.signIn()" class="btn-reauth">Re-authenticate</button>
             `;
         }
     });

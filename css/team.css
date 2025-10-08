@@ -1,38 +1,68 @@
+/* Page header - Material Design style */
+.page-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--white);
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+}
+
+.page-header h2 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-md);
+}
+
+.page-header p {
+    font-size: var(--font-size-lg);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .team-section {
-    padding: 40px 20px;
+    padding: var(--spacing-2xl) 0;
+    background-color: var(--light-color);
 }
 
 .auth-prompt {
     text-align: center;
-    padding: 60px 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-    margin: 20px 0;
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin: 0 auto;
+    max-width: 500px;
 }
 
 .auth-prompt h3 {
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-2xl);
+    color: var(--dark-color);
 }
 
 .team-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 30px;
-    margin-bottom: 20px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
 }
 
 .team-card h3 {
-    margin-bottom: 15px;
-    font-size: 24px;
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-2xl);
+    color: var(--dark-color);
+}
+
+.team-card p {
+    color: var(--dark-color);
+    opacity: 0.7;
+    font-size: var(--font-size-base);
 }
 
 .team-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-top: 30px;
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
 }
 
 @media (max-width: 768px) {
@@ -42,74 +72,99 @@
 }
 
 .action-card {
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
+    padding: var(--spacing-xl);
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    border: 2px solid #E0E0E0;
+    transition: var(--transition);
+}
+
+.action-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .action-card h4 {
-    margin-bottom: 15px;
-    font-size: 18px;
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-xl);
+    color: var(--dark-color);
 }
 
 .team-input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-    margin-bottom: 15px;
+    padding: var(--spacing-md);
+    border: 2px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-md);
+    transition: var(--transition);
+}
+
+.team-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
 .btn-primary {
-    background: #007bff;
-    color: white;
+    background: var(--primary-color);
+    color: var(--white);
     border: none;
-    padding: 12px 24px;
-    border-radius: 6px;
-    font-size: 16px;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-weight: 500;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: var(--transition);
+    min-height: var(--touch-target);
+    width: 100%;
 }
 
 .btn-primary:hover {
-    background: #0056b3;
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: var(--secondary-color);
+    color: var(--white);
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-weight: 500;
     cursor: pointer;
-    transition: background 0.3s;
-    margin-top: 10px;
+    transition: var(--transition);
+    margin-top: var(--spacing-md);
 }
 
 .btn-secondary:hover {
-    background: #545b62;
+    background: var(--secondary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .score-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 30px;
-    margin-bottom: 20px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
 }
 
 .score-card h3 {
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-2xl);
+    color: var(--dark-color);
 }
 
 .score-display {
-    background: #fff3cd;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    background: var(--light-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-md);
+    border: 2px solid #E0E0E0;
 }
 
 .score-item {
@@ -129,27 +184,28 @@
 
 .score-value {
     font-size: 18px;
-    color: #28a745;
+    color: var(--success-color);
 }
 
 .total-score {
     font-size: 32px;
     font-weight: bold;
     text-align: center;
-    color: #28a745;
+    color: var(--success-color);
     margin: 20px 0;
 }
 
 .challenges-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 30px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: var(--spacing-xl);
 }
 
 .challenges-card h3 {
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-2xl);
+    color: var(--dark-color);
 }
 
 .challenge-progress {
@@ -162,12 +218,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background: #f8f9fa;
+    background: var(--light-color);
     border-radius: 6px;
 }
 
 .challenge-item.completed {
-    background: #d4edda;
+    background: #C8E6C9; /* Light fresh green */
 }
 
 .challenge-name {
@@ -188,13 +244,13 @@
 }
 
 .status-badge.completed {
-    background: #28a745;
+    background: var(--success-color);
     color: white;
 }
 
 .status-badge.pending {
-    background: #ffc107;
-    color: #000;
+    background: var(--warning-color);
+    color: var(--dark-color);
 }
 
 .score-loading {
@@ -212,8 +268,8 @@
     width: 40px;
     height: 40px;
     margin: 0 auto 10px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
+    border: 4px solid var(--light-color);
+    border-top: 4px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -245,33 +301,57 @@
 .user-info {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-sm);
     margin-left: auto;
-    margin-right: 20px;
 }
 
 .user-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .user-name {
-    font-size: 14px;
-    color: #333;
+    font-size: var(--font-size-sm);
+    color: var(--white);
+    font-weight: 500;
 }
 
 .sign-out-btn {
     background: transparent;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--white);
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.sign-out-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--white);
+    transform: translateY(-1px);
+}
+
+.btn-reauth {
+    background: var(--warning-color);
+    border: none;
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
+    color: var(--dark-color);
+    transition: background 0.2s;
+    font-weight: 500;
 }
 
-.sign-out-btn:hover {
-    background: #f8f9fa;
+.btn-reauth:hover {
+    background: var(--warning-color);
+    opacity: 0.9;
 }
 
 @media (max-width: 768px) {

@@ -378,7 +378,7 @@
                     <button class="btn btn-secondary"
                             onclick="window.Challenges.completeChallenge('${challenge.id}')"
                             data-challenge-id="${challenge.id}">
-                        ${isCompleted ? '✓ Completed' : 'Complete & Upload'}
+                        ${isCompleted ? '✏️ Edit' : 'Complete & Upload'}
                     </button>
                 ` : ''}
             </div>
@@ -702,7 +702,7 @@
     async function completeChallenge(challengeId) {
         const challenge = challengesData.find(c => c.id === challengeId);
         if (!challenge) {
-            alert('Challenge not found');
+            window.toast.error('Challenge not found');
             return;
         }
 
@@ -710,29 +710,40 @@
         // Check both in-memory and localStorage
         const teamName = window.Team?.getCurrentTeam() || localStorage.getItem('scavenger_team');
         if (!teamName) {
-            alert('Please join or create a team first on the Team page');
+            window.toast.warning('Please join or create a team first on the Team page');
             return;
         }
 
         // Check if authenticated
         if (typeof gapi === 'undefined' || !gapi.client?.getToken()) {
-            alert('Please sign in with Google first');
+            window.toast.error('Please sign in with Google first');
             return;
         }
 
+        // Check if challenge is already completed
+        const status = getChallengeStatus(challengeId);
+        const existingData = status === 'completed' ? getChallengeFromCache(challengeId) : null;
+
         // Show completion modal
-        showCompletionModal(challenge, teamName);
+        showCompletionModal(challenge, teamName, existingData);
     }
 
-    async function showCompletionModal(challenge, teamName) {
+    function getChallengeFromCache(challengeId) {
+        if (!teamChallengesCache) return null;
+        return teamChallengesCache.find(c => c.challengeId === challengeId);
+    }
+
+    async function showCompletionModal(challenge, teamName, existingData = null) {
         // Initialize location manager
         const locationManager = new window.LocationManager();
-        
+
+        const isEditing = existingData !== null;
+
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.innerHTML = `
             <div class="modal-content">
-                <h2>Complete Challenge</h2>
+                <h2>${isEditing ? 'Edit Challenge' : 'Complete Challenge'}</h2>
                 <h3>${escapeHTML(challenge.title)}</h3>
 
                 <form id="completion-form">
@@ -745,12 +756,12 @@
                     
                     <div class="form-group">
                         <label for="neighborhood-bonus">Neighborhood Bonus Points:</label>
-                        <input type="number" id="neighborhood-bonus" value="0" min="0">
+                        <input type="number" id="neighborhood-bonus" value="${existingData?.neighborhoodBonus || 0}" min="0">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="other-bonus">Other Bonus Points:</label>
-                        <input type="number" id="other-bonus" value="0" min="0">
+                        <input type="number" id="other-bonus" value="${existingData?.otherBonus || 0}" min="0">
                     </div>
                     
                     <div class="form-group">
@@ -759,12 +770,12 @@
                         <button type="button" class="btn btn-secondary" onclick="document.getElementById('photo-upload').click()">
                             📷 Select Photos
                         </button>
-                        <div id="photo-preview" class="photo-preview"></div>
+                        <div id="photo-preview" class="photo-preview-grid"></div>
                     </div>
                     
                     <div class="form-group">
                         <label for="notes">Notes:</label>
-                        <textarea id="notes" placeholder="Any additional notes about this challenge"></textarea>
+                        <textarea id="notes" placeholder="Any additional notes about this challenge">${existingData?.notes || ''}</textarea>
                     </div>
                     
                     <div class="modal-actions">
@@ -804,18 +815,148 @@
         const photoInput = modal.querySelector('#photo-upload');
         const photoPreview = modal.querySelector('#photo-preview');
         let selectedPhotos = [];
+        let existingPhotoLinks = [];
+
+        // Parse existing photos if editing
+        if (isEditing && existingData?.photoLinks) {
+            existingPhotoLinks = existingData.photoLinks.split('\n').filter(link => link.trim());
+        }
+
+        async function renderPhotoPreview() {
+            photoPreview.innerHTML = '';
+
+            // Show existing photos from Drive - fetch in parallel for speed
+            const photoPromises = existingPhotoLinks.map(async (link, i) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-preview-item';
+
+                // Extract file ID from Drive link
+                const fileIdMatch = link.match(/\/d\/([^\/]+)/);
+
+                if (fileIdMatch) {
+                    const fileId = fileIdMatch[1];
+
+                    // Create placeholder first
+                    photoItem.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f0f0f0;">
+                            <span>...</span>
+                        </div>
+                        <button type="button" class="remove-photo">×</button>
+                    `;
+                    photoPreview.appendChild(photoItem);
+
+                    // Fetch thumbnail using Drive API with auth and convert to data URL
+                    try {
+                        const token = gapi.client.getToken();
+
+                        // Fetch the file content directly (will download full size, so we downscale aggressively)
+                        const response = await fetch(
+                            `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+                            {
+                                headers: {
+                                    'Authorization': `Bearer ${token.access_token}`
+                                }
+                            }
+                        );
+
+                        if (response.ok) {
+                            const blob = await response.blob();
+
+                            // Create a thumbnail by loading into canvas and downscaling
+                            const dataUrl = await new Promise((resolve, reject) => {
+                                const img = new Image();
+                                img.onload = () => {
+                                    const canvas = document.createElement('canvas');
+                                    const ctx = canvas.getContext('2d');
+
+                                    // Downscale to max 200px for faster loading
+                                    const maxSize = 200;
+                                    let width = img.width;
+                                    let height = img.height;
+
+                                    if (width > height && width > maxSize) {
+                                        height = (height / width) * maxSize;
+                                        width = maxSize;
+                                    } else if (height > maxSize) {
+                                        width = (width / height) * maxSize;
+                                        height = maxSize;
+                                    }
+
+                                    canvas.width = width;
+                                    canvas.height = height;
+                                    ctx.drawImage(img, 0, 0, width, height);
+                                    resolve(canvas.toDataURL('image/jpeg', 0.6));
+                                };
+                                img.onerror = reject;
+                                img.src = URL.createObjectURL(blob);
+                            });
+
+                            photoItem.innerHTML = `
+                                <img src="${dataUrl}"
+                                     alt="Photo ${i + 1}"
+                                     style="cursor: pointer;"
+                                     onclick="window.open('${link}', '_blank')">
+                                <button type="button" class="remove-photo">×</button>
+                            `;
+                        } else {
+                            // Fallback to broken image
+                            photoItem.innerHTML = `
+                                <img src="" alt="Photo ${i + 1}" style="cursor: pointer;" onclick="window.open('${link}', '_blank')">
+                                <button type="button" class="remove-photo">×</button>
+                            `;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching thumbnail:', error);
+                        photoItem.innerHTML = `
+                            <img src="" alt="Photo ${i + 1}" style="cursor: pointer;" onclick="window.open('${link}', '_blank')">
+                            <button type="button" class="remove-photo">×</button>
+                        `;
+                    }
+
+                    // Attach remove handler (capture index in closure)
+                    const removeBtn = photoItem.querySelector('.remove-photo');
+                    const currentIndex = i;
+                    removeBtn.addEventListener('click', () => {
+                        existingPhotoLinks.splice(currentIndex, 1);
+                        renderPhotoPreview();
+                    });
+                }
+            });
+
+            // Wait for all photos to load
+            await Promise.all(photoPromises);
+
+            // Show newly selected photos
+            selectedPhotos.forEach((photo, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const photoItem = document.createElement('div');
+                    photoItem.className = 'photo-preview-item';
+                    photoItem.innerHTML = `
+                        <img src="${e.target.result}" alt="New photo ${index + 1}">
+                        <button type="button" class="remove-photo" data-new-index="${index}">×</button>
+                    `;
+                    photoPreview.appendChild(photoItem);
+
+                    // Add remove handler for new photo
+                    photoItem.querySelector('.remove-photo').addEventListener('click', () => {
+                        selectedPhotos.splice(index, 1);
+                        renderPhotoPreview();
+                    });
+                };
+                reader.readAsDataURL(photo);
+            });
+        }
+
+        // Render existing photos if editing
+        if (isEditing) {
+            renderPhotoPreview();
+        }
 
         photoInput.addEventListener('change', (e) => {
-            selectedPhotos = Array.from(e.target.files);
-            if (selectedPhotos.length > 0) {
-                photoPreview.innerHTML = `
-                    <div class="photo-count">
-                        ✓ ${selectedPhotos.length} photo${selectedPhotos.length > 1 ? 's' : ''} selected
-                    </div>
-                `;
-            } else {
-                photoPreview.innerHTML = '';
-            }
+            // Add to existing photos, don't replace
+            selectedPhotos.push(...Array.from(e.target.files));
+            renderPhotoPreview();
         });
 
         const form = modal.querySelector('#completion-form');
@@ -830,9 +971,9 @@
             submitBtn.textContent = 'Uploading...';
 
             try {
-                let photoLinks = '';
+                let newPhotoLinks = [];
 
-                // Upload photos to Google Drive if any selected
+                // Upload NEW photos to Google Drive if any selected
                 if (selectedPhotos.length > 0) {
                     // Ensure team folder exists (creates if needed)
                     const teamFolderId = await window.driveManager.ensureTeamFolder(teamName);
@@ -845,11 +986,14 @@
                         teamFolderId
                     );
 
-                    // Create links string
-                    photoLinks = uploadedPhotos
-                        .map(photo => `https://drive.google.com/file/d/${photo.id}/view`)
-                        .join('\n');
+                    // Create links array from uploaded photos
+                    newPhotoLinks = uploadedPhotos
+                        .map(photo => `https://drive.google.com/file/d/${photo.id}/view`);
                 }
+
+                // Merge existing photos with new ones
+                const allPhotoLinks = [...existingPhotoLinks, ...newPhotoLinks];
+                const photoLinks = allPhotoLinks.join('\n');
 
                 // Update or add challenge in Google Sheets
                 const success = await window.SheetsAPI.updateOrAddChallengeByName(
@@ -892,13 +1036,13 @@
 
                     modal.remove();
                     displayChallenges(); // Refresh display
-                    alert('Challenge completed and uploaded to Google Sheets!');
+                    window.toast.success(isEditing ? 'Challenge updated successfully!' : 'Challenge completed and uploaded!');
                 } else {
-                    alert('Error uploading to Google Sheets. Please try again.');
+                    window.toast.error('Error uploading to Google Sheets. Please try again.');
                 }
             } catch (error) {
                 console.error('Error completing challenge:', error);
-                alert('Error uploading to Google Sheets: ' + error.message);
+                window.toast.error('Error uploading to Google Sheets: ' + error.message);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit to Google Sheets';
             }
