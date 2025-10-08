@@ -49,137 +49,109 @@
                     <p class="scoring-description">Complete at least one challenge in a neighborhood below to score
                         bonus points!</p>
 
-                    <div class="legend-and-table-container">
-                        <div class="map-legend">
-                            <h4>Map Legend</h4>
-                            <div class="legend-items">
-                                <div class="legend-item">
-                                    <span class="legend-color" style="background-color: #89B8D9;"></span>
-                                    <span class="legend-label">8 points</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-color" style="background-color: #F7B27A;"></span>
-                                    <span class="legend-label">12 points</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-color" style="background-color: #52A447;"></span>
-                                    <span class="legend-label">16 points</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-color" style="background-color: #9B59B6;"></span>
-                                    <span class="legend-label">20 points</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-color" style="background-color: #FF6B6B;"></span>
-                                    <span class="legend-label">24 points</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-color legend-white"></span>
-                                    <span class="legend-label">In bounds, no bonus</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-color legend-candy-cane"></span>
-                                    <span class="legend-label">Out of bounds</span>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="neighborhoods-table">
-                            <h4>Neighborhood Bonus Points</h4>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Borough</th>
-                                        <th>Neighborhood</th>
-                                        <th>Points</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td rowspan="4" class="borough-cell">Manhattan</td>
-                                        <td>Below Central Park</td>
-                                        <td>No bonus</td>
-                                    </tr>
-                                    <tr>
-                                        <td>UWS</td>
-                                        <td>8</td>
-                                    </tr>
-                                    <tr>
-                                        <td>UES</td>
-                                        <td>8</td>
-                                    </tr>
-                                    <tr>
-                                        <td>North of Central Park</td>
-                                        <td>12</td>
-                                    </tr>
-                                    <tr>
-                                        <td rowspan="5" class="borough-cell">Queens</td>
-                                        <td>LIC/Hunters Point</td>
-                                        <td>8</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Astoria</td>
-                                        <td>12</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jackson Heights</td>
-                                        <td>16</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Flushing</td>
-                                        <td>24</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Forest Hills</td>
-                                        <td>20</td>
-                                    </tr>
-                                    <tr>
-                                        <td rowspan="11" class="borough-cell">Brooklyn</td>
-                                        <td>Dumbo</td>
-                                        <td>8</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Williamsburg / Greenpoint</td>
-                                        <td>8</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Gowanus</td>
-                                        <td>8</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Park Slope</td>
-                                        <td>8</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sunset Park</td>
-                                        <td>20</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Red Hook</td>
-                                        <td>12</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Coney Island</td>
-                                        <td>20</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Crown Heights</td>
-                                        <td>20</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Bushwick</td>
-                                        <td>20</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Flatbush</td>
-                                        <td>24</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Brighton Beach</td>
-                                        <td>20</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="neighborhoods-table">
+                        <h4>Neighborhood Bonus Points</h4>
+                        <div class="borough-dropdown">
+                            <details>
+                                <summary>Manhattan</summary>
+                                <ul class="neighborhood-list">
+                                    <li>
+                                        <span class="neighborhood-name">Below Central Park</span>
+                                        <span class="points">No bonus</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">UWS</span>
+                                        <span class="points">8 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">UES</span>
+                                        <span class="points">8 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">North of Central Park</span>
+                                        <span class="points">12 pts</span>
+                                    </li>
+                                </ul>
+                            </details>
+                        </div>
+                        <div class="borough-dropdown">
+                            <details>
+                                <summary>Queens</summary>
+                                <ul class="neighborhood-list">
+                                    <li>
+                                        <span class="neighborhood-name">LIC/Hunters Point</span>
+                                        <span class="points">8 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Astoria</span>
+                                        <span class="points">12 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Jackson Heights</span>
+                                        <span class="points">16 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Flushing</span>
+                                        <span class="points">24 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Forest Hills</span>
+                                        <span class="points">20 pts</span>
+                                    </li>
+                                </ul>
+                            </details>
+                        </div>
+                        <div class="borough-dropdown">
+                            <details>
+                                <summary>Brooklyn</summary>
+                                <ul class="neighborhood-list">
+                                    <li>
+                                        <span class="neighborhood-name">Dumbo</span>
+                                        <span class="points">8 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Williamsburg / Greenpoint</span>
+                                        <span class="points">8 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Gowanus</span>
+                                        <span class="points">8 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Park Slope</span>
+                                        <span class="points">8 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Sunset Park</span>
+                                        <span class="points">20 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Red Hook</span>
+                                        <span class="points">12 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Coney Island</span>
+                                        <span class="points">20 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Crown Heights</span>
+                                        <span class="points">20 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Bushwick</span>
+                                        <span class="points">20 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Flatbush</span>
+                                        <span class="points">24 pts</span>
+                                    </li>
+                                    <li>
+                                        <span class="neighborhood-name">Brighton Beach</span>
+                                        <span class="points">20 pts</span>
+                                    </li>
+                                </ul>
+                            </details>
                         </div>
                     </div>
 

@@ -203,45 +203,83 @@
     text-align: center;
 }
 
-.neighborhoods-table table {
-    width: 100%;
-    border-collapse: collapse;
+/* Borough dropdown styles */
+.borough-dropdown {
+    margin-bottom: var(--spacing-md);
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
 }
 
-.neighborhoods-table th {
+.borough-dropdown details {
+    background-color: var(--white);
+}
+
+.borough-dropdown summary {
     background-color: var(--primary-color);
     color: var(--white);
-    padding: var(--spacing-sm) var(--spacing-md);
-    text-align: left;
+    padding: var(--spacing-md);
+    font-size: var(--font-size-lg);
     font-weight: 600;
-    font-size: var(--font-size-base);
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.neighborhoods-table td {
+.borough-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.borough-dropdown summary::after {
+    content: '▼';
+    font-size: var(--font-size-sm);
+    transition: transform 0.3s ease;
+}
+
+.borough-dropdown details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.borough-dropdown summary:hover {
+    background-color: var(--primary-dark);
+}
+
+.neighborhood-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.neighborhood-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: var(--spacing-sm) var(--spacing-md);
     border-bottom: 1px solid #dee2e6;
-    font-size: var(--font-size-base);
+    transition: var(--transition);
 }
 
-.neighborhoods-table tbody tr:last-child td {
+.neighborhood-list li:last-child {
     border-bottom: none;
 }
 
-.neighborhoods-table tbody tr:hover {
+.neighborhood-list li:hover {
     background-color: var(--light-color);
 }
 
-.borough-cell {
-    font-weight: 600;
-    background-color: var(--light-color);
-    vertical-align: top;
-    border-right: 2px solid #dee2e6;
+.neighborhood-list .neighborhood-name {
+    font-size: var(--font-size-base);
+    color: var(--dark-color);
 }
 
-.neighborhoods-table td:last-child {
-    text-align: center;
+.neighborhood-list .points {
     font-weight: 600;
     color: var(--primary-color);
+    font-size: var(--font-size-base);
 }
 
 /* Neighborhoods section */
