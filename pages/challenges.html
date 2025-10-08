@@ -51,17 +51,32 @@
                     </button>
                 </div>
 
-                <!-- Search Box (Initially Hidden) -->
-                <div class="search-box-expandable" id="search-box" style="display: none;">
-                    <input type="text" id="challenge-search" placeholder="Search challenges..." aria-label="Search challenges">
-                    <button class="search-close" id="search-close" aria-label="Close search">×</button>
+                <!-- Search Bottom Sheet Overlay -->
+                <div class="bottom-sheet-overlay" id="search-overlay"></div>
+
+                <!-- Search Bottom Sheet -->
+                <div class="bottom-sheet" id="search-sheet">
+                    <div class="bottom-sheet-header">
+                        <h3>Search Challenges</h3>
+                        <button class="bottom-sheet-close" id="search-sheet-close" aria-label="Close search">×</button>
+                    </div>
+                    <div class="bottom-sheet-content">
+                        <div class="search-box-expandable">
+                            <input type="text" id="challenge-search" placeholder="Search challenges..." aria-label="Search challenges">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- More Filters Panel (Initially Hidden) -->
-                <div class="more-filters-panel" id="more-filters-panel" style="display: none;">
-                    <div class="filter-panel-content">
-                        <h3>Additional Filters</h3>
+                <!-- Filters Bottom Sheet Overlay -->
+                <div class="bottom-sheet-overlay" id="filters-overlay"></div>
 
+                <!-- More Filters Bottom Sheet -->
+                <div class="bottom-sheet" id="filters-sheet">
+                    <div class="bottom-sheet-header">
+                        <h3>Filters & Sorting</h3>
+                        <button class="bottom-sheet-close" id="filters-sheet-close" aria-label="Close filters">×</button>
+                    </div>
+                    <div class="bottom-sheet-content">
                         <div class="filter-group">
                             <label for="points-sort">Sort by Points:</label>
                             <select id="points-sort" aria-label="Sort by points">

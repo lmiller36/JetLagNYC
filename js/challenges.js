@@ -10,11 +10,6 @@
     let filteredChallenges = [];
     let teamChallengesCache = null; // In-memory cache
 
-    // Pagination state
-    let currentPage = 1;
-    const ITEMS_PER_PAGE_MOBILE = 4;
-    const ITEMS_PER_PAGE_DESKTOP = 50;
-
     /**
      * Escape HTML to prevent XSS attacks
      * @param {string} str - String to escape
@@ -38,10 +33,7 @@
     let noResults;
     let filterChips;
     let searchToggle;
-    let searchBox;
-    let searchClose;
     let moreFiltersBtn;
-    let moreFiltersPanel;
     let applyFiltersBtn;
 
     // Current filter state
@@ -65,10 +57,7 @@
 
         // New chip-based UI elements
         searchToggle = document.getElementById('search-toggle');
-        searchBox = document.getElementById('search-box');
-        searchClose = document.getElementById('search-close');
         moreFiltersBtn = document.getElementById('more-filters');
-        moreFiltersPanel = document.getElementById('more-filters-panel');
         applyFiltersBtn = document.getElementById('apply-filters');
         filterChips = document.querySelectorAll('.filter-chip');
 
@@ -81,48 +70,81 @@
 
     function setupEventListeners() {
         // Filter chips
-        if (filterChips) {
+        if (filterChips && filterChips.length > 0) {
+            console.log('Setting up filter chip listeners for', filterChips.length, 'chips');
             filterChips.forEach(chip => {
                 chip.addEventListener('click', function() {
                     const category = this.getAttribute('data-category');
+                    console.log('Filter chip clicked:', category);
                     setActiveChip(category);
                     currentCategory = category;
                     filterChallenges();
                 });
             });
+        } else {
+            console.warn('No filter chips found!');
         }
 
-        // Search toggle
-        if (searchToggle && searchBox) {
+        // Bottom sheet setup
+        const searchSheet = document.getElementById('search-sheet');
+        const searchOverlay = document.getElementById('search-overlay');
+        const searchSheetClose = document.getElementById('search-sheet-close');
+        const filtersSheet = document.getElementById('filters-sheet');
+        const filtersOverlay = document.getElementById('filters-overlay');
+        const filtersSheetClose = document.getElementById('filters-sheet-close');
+
+        // Search toggle - opens bottom sheet
+        if (searchToggle) {
             searchToggle.addEventListener('click', function() {
-                searchBox.style.display = searchBox.style.display === 'none' ? 'flex' : 'none';
-                if (searchBox.style.display === 'flex') {
-                    searchInput.focus();
-                }
+                searchSheet.classList.add('active');
+                searchOverlay.classList.add('active');
+                // Small delay to ensure the sheet is visible before focusing
+                setTimeout(() => {
+                    if (searchInput) searchInput.focus();
+                }, 300);
             });
         }
 
-        // Search close
-        if (searchClose) {
-            searchClose.addEventListener('click', function() {
-                searchBox.style.display = 'none';
-                searchInput.value = '';
-                filterChallenges();
-            });
+        // Close search sheet
+        function closeSearchSheet() {
+            searchSheet.classList.remove('active');
+            searchOverlay.classList.remove('active');
         }
 
-        // More filters toggle
-        if (moreFiltersBtn && moreFiltersPanel) {
+        if (searchSheetClose) {
+            searchSheetClose.addEventListener('click', closeSearchSheet);
+        }
+
+        if (searchOverlay) {
+            searchOverlay.addEventListener('click', closeSearchSheet);
+        }
+
+        // More filters toggle - opens bottom sheet
+        if (moreFiltersBtn) {
             moreFiltersBtn.addEventListener('click', function() {
-                const isVisible = moreFiltersPanel.style.display !== 'none';
-                moreFiltersPanel.style.display = isVisible ? 'none' : 'block';
+                filtersSheet.classList.add('active');
+                filtersOverlay.classList.add('active');
             });
         }
 
-        // Apply filters button
+        // Close filters sheet
+        function closeFiltersSheet() {
+            filtersSheet.classList.remove('active');
+            filtersOverlay.classList.remove('active');
+        }
+
+        if (filtersSheetClose) {
+            filtersSheetClose.addEventListener('click', closeFiltersSheet);
+        }
+
+        if (filtersOverlay) {
+            filtersOverlay.addEventListener('click', closeFiltersSheet);
+        }
+
+        // Apply filters button - close sheet and apply
         if (applyFiltersBtn) {
             applyFiltersBtn.addEventListener('click', function() {
-                moreFiltersPanel.style.display = 'none';
+                closeFiltersSheet();
                 filterChallenges();
             });
         }
@@ -297,9 +319,6 @@
         }
         // 'default' maintains original order
 
-        // Reset to page 1 when filters change
-        currentPage = 1;
-
         displayChallenges();
         updateResultsCount();
     }
@@ -314,59 +333,12 @@
 
         hideNoResults();
 
-        // Determine items per page based on screen size
-        const isMobile = window.innerWidth < 768;
-        const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
-
-        // Calculate pagination
-        const totalPages = Math.ceil(filteredChallenges.length / itemsPerPage);
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const challengesToShow = filteredChallenges.slice(startIndex, endIndex);
-
-        const challengesHTML = challengesToShow.map(challenge =>
+        // Display all challenges
+        const challengesHTML = filteredChallenges.map(challenge =>
             createChallengeCard(challenge)
         ).join('');
 
         challengesContainer.innerHTML = challengesHTML;
-
-        // Update or create pagination controls
-        updatePaginationControls(totalPages, isMobile);
-    }
-
-    function updatePaginationControls(totalPages, isMobile) {
-        let paginationContainer = document.getElementById('pagination-controls');
-
-        if (!paginationContainer) {
-            // Create pagination container
-            paginationContainer = document.createElement('div');
-            paginationContainer.id = 'pagination-controls';
-            paginationContainer.className = 'pagination-controls';
-            challengesContainer.parentElement.appendChild(paginationContainer);
-        }
-
-        if (!isMobile || totalPages <= 1) {
-            paginationContainer.style.display = 'none';
-            return;
-        }
-
-        paginationContainer.style.display = 'flex';
-
-        const itemsPerPage = ITEMS_PER_PAGE_MOBILE;
-        const startItem = (currentPage - 1) * itemsPerPage + 1;
-        const endItem = Math.min(currentPage * itemsPerPage, filteredChallenges.length);
-
-        paginationContainer.innerHTML = `
-            <button class="btn-pagination" onclick="window.Challenges.previousPage()" ${currentPage === 1 ? 'disabled' : ''}>
-                ← Previous
-            </button>
-            <span class="pagination-info">
-                ${startItem}-${endItem} of ${filteredChallenges.length}
-            </span>
-            <button class="btn-pagination" onclick="window.Challenges.nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>
-                Next →
-            </button>
-        `;
     }
 
     function createChallengeCard(challenge) {
@@ -1145,26 +1117,6 @@
     }
 
     // Expose functions for potential external use
-    function nextPage() {
-        const isMobile = window.innerWidth < 768;
-        const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
-        const totalPages = Math.ceil(filteredChallenges.length / itemsPerPage);
-
-        if (currentPage < totalPages) {
-            currentPage++;
-            displayChallenges();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
-
-    function previousPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            displayChallenges();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
-
     window.Challenges = {
         filterChallenges: filterChallenges,
         clearAllFilters: clearAllFilters,
@@ -1176,8 +1128,6 @@
         retryLocation: retryLocation,
         toggleCard: toggleCard,
         loadTeamChallengesCache: loadTeamChallengesCache,
-        nextPage: nextPage,
-        previousPage: previousPage,
         clearTeamChallengesCache: clearTeamChallengesCache,
         getChallengeFromCache: getChallengeFromCache
     };
