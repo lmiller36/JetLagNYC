@@ -168,7 +168,8 @@
 
 .chip-count {
     font-size: var(--font-size-sm);
-    color: var(--secondary-color);
+    color: var(--dark-color);
+    opacity: 0.6;
     font-weight: 400;
 }
 
@@ -316,7 +317,7 @@
 
 .results-summary p {
     font-size: var(--font-size-lg);
-    color: var(--secondary-color);
+    color: var(--dark-color);
     margin: 0;
 }
 
@@ -363,7 +364,7 @@
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     transition: all 0.3s ease;
-    border-left: 4px solid var(--secondary-color); /* Orange accent */
+    border-left: 4px solid var(--primary-color); /* Coral accent */
     overflow: hidden;
 }
 
@@ -412,19 +413,19 @@
 }
 
 .category-icon.easy {
-    background-color: #C8E6C9; /* Green 100 */
+    background-color: #E8F5E9; /* Light green */
 }
 
 .category-icon.medium {
-    background-color: #FFE0B2; /* Orange 100 */
+    background-color: #FFF4E0; /* Light warm yellow */
 }
 
 .category-icon.hard {
-    background-color: #FFCDD2; /* Red 100 */
+    background-color: #FFE5E5; /* Light coral */
 }
 
 .category-icon.location-specific {
-    background-color: #BBDEFB; /* Blue 100 */
+    background-color: #F8E0EB; /* Light rose */
 }
 
 .preview-content {
@@ -550,26 +551,26 @@
     margin-bottom: var(--spacing-md);
 }
 
-/* Material Design category colors */
+/* Warm palette category colors */
 .category-easy,
 .category-general {
-    background-color: #C8E6C9; /* Green 100 */
-    color: #2E7D32; /* Green 800 */
+    background-color: #E8F5E9; /* Light green */
+    color: #4A7C59; /* Dark green */
 }
 
 .category-medium {
-    background-color: #FFE0B2; /* Orange 100 */
-    color: #E65100; /* Orange 900 */
+    background-color: #FFF4E0; /* Light warm yellow */
+    color: #B8932F; /* Dark yellow */
 }
 
 .category-hard {
-    background-color: #FFCDD2; /* Red 100 */
-    color: #C62828; /* Red 800 */
+    background-color: #FFE5E5; /* Light coral */
+    color: #C65A4F; /* Dark coral */
 }
 
 .category-location-specific {
-    background-color: #BBDEFB; /* Blue 100 */
-    color: #1565C0; /* Blue 800 */
+    background-color: #F8E0EB; /* Light rose */
+    color: #A54664; /* Dark rose */
 }
 
 .challenge-description {
@@ -677,6 +678,51 @@
     opacity: 0.7;
 }
 
+/* Pagination controls */
+.pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl) 0;
+    margin-top: var(--spacing-xl);
+}
+
+.btn-pagination {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    min-height: var(--touch-target);
+    flex: 1;
+    max-width: 120px;
+}
+
+.btn-pagination:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-pagination:disabled {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: var(--font-size-base);
+    color: var(--dark-color);
+    font-weight: 600;
+    text-align: center;
+    flex: 1;
+}
+
 /* Responsive design */
 @media (min-width: 768px) {
     .filter-controls {
@@ -753,12 +799,15 @@ Challenge actions */
 
 .btn-success {
     background-color: var(--success-color);
+    color: var(--white);
     border-color: var(--success-color);
+    font-weight: 600;
 }
 
 .btn-success:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
+    background-color: var(--success-dark);
+    border-color: var(--success-dark);
+    color: var(--white);
 }
 
 /* Challenge status states */

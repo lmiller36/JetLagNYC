@@ -245,19 +245,24 @@ function escapeHTML(str) {
 function updateUserUI() {
     console.log('Updating user UI, currentUser:', currentUser);
     const userInfoElements = document.querySelectorAll('#userInfo, .user-info');
+    const userInfoMobile = document.getElementById('userInfoMobile');
     console.log('Found user info elements:', userInfoElements.length);
 
+    const userInfoHTML = currentUser ? `
+        <img src="${escapeHTML(currentUser.picture)}" alt="${escapeHTML(currentUser.name)}" class="user-avatar">
+        <span class="user-name">${escapeHTML(currentUser.name)}</span>
+        <button onclick="window.Auth.signOut()" class="sign-out-btn">Sign Out</button>
+    ` : '';
+
+    // Update desktop user info
     userInfoElements.forEach(element => {
-        if (currentUser) {
-            element.innerHTML = `
-                <img src="${escapeHTML(currentUser.picture)}" alt="${escapeHTML(currentUser.name)}" class="user-avatar">
-                <span class="user-name">${escapeHTML(currentUser.name)}</span>
-                <button onclick="window.Auth.signOut()" class="sign-out-btn">Sign Out</button>
-            `;
-        } else {
-            element.innerHTML = '';
-        }
+        element.innerHTML = userInfoHTML;
     });
+
+    // Update mobile user info in dropdown
+    if (userInfoMobile) {
+        userInfoMobile.innerHTML = userInfoHTML;
+    }
 }
 
 /**

@@ -27,6 +27,9 @@ function loadSharedNavigation() {
                         <span class="hamburger"></span>
                     </button>
                     <ul class="nav-menu">
+                        <li class="nav-user-info-mobile">
+                            <div id="userInfoMobile" class="user-info-mobile"></div>
+                        </li>
                         <li><a href="${pathPrefix}index.html" class="nav-link" data-page="home">Home</a></li>
                         <li><a href="${pathPrefix}pages/challenges.html" class="nav-link" data-page="challenges">Challenges</a></li>
                         <li><a href="${pathPrefix}pages/neighborhoods.html" class="nav-link" data-page="neighborhoods">Neighborhoods</a></li>

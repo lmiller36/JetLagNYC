@@ -10,6 +10,11 @@
     let filteredChallenges = [];
     let teamChallengesCache = null; // In-memory cache
 
+    // Pagination state
+    let currentPage = 1;
+    const ITEMS_PER_PAGE_MOBILE = 4;
+    const ITEMS_PER_PAGE_DESKTOP = 50;
+
     /**
      * Escape HTML to prevent XSS attacks
      * @param {string} str - String to escape
@@ -292,6 +297,9 @@
         }
         // 'default' maintains original order
 
+        // Reset to page 1 when filters change
+        currentPage = 1;
+
         displayChallenges();
         updateResultsCount();
     }
@@ -306,11 +314,59 @@
 
         hideNoResults();
 
-        const challengesHTML = filteredChallenges.map(challenge =>
+        // Determine items per page based on screen size
+        const isMobile = window.innerWidth < 768;
+        const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
+
+        // Calculate pagination
+        const totalPages = Math.ceil(filteredChallenges.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const challengesToShow = filteredChallenges.slice(startIndex, endIndex);
+
+        const challengesHTML = challengesToShow.map(challenge =>
             createChallengeCard(challenge)
         ).join('');
 
         challengesContainer.innerHTML = challengesHTML;
+
+        // Update or create pagination controls
+        updatePaginationControls(totalPages, isMobile);
+    }
+
+    function updatePaginationControls(totalPages, isMobile) {
+        let paginationContainer = document.getElementById('pagination-controls');
+
+        if (!paginationContainer) {
+            // Create pagination container
+            paginationContainer = document.createElement('div');
+            paginationContainer.id = 'pagination-controls';
+            paginationContainer.className = 'pagination-controls';
+            challengesContainer.parentElement.appendChild(paginationContainer);
+        }
+
+        if (!isMobile || totalPages <= 1) {
+            paginationContainer.style.display = 'none';
+            return;
+        }
+
+        paginationContainer.style.display = 'flex';
+
+        const itemsPerPage = ITEMS_PER_PAGE_MOBILE;
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, filteredChallenges.length);
+
+        paginationContainer.innerHTML = `
+            <button class="btn-pagination" onclick="window.Challenges.previousPage()" ${currentPage === 1 ? 'disabled' : ''}>
+                ← Previous
+            </button>
+            <span class="pagination-info">
+                ${startItem}-${endItem} of ${filteredChallenges.length}
+            </span>
+            <button class="btn-pagination" onclick="window.Challenges.nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>
+                Next →
+            </button>
+        `;
     }
 
     function createChallengeCard(challenge) {
@@ -1089,6 +1145,26 @@
     }
 
     // Expose functions for potential external use
+    function nextPage() {
+        const isMobile = window.innerWidth < 768;
+        const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
+        const totalPages = Math.ceil(filteredChallenges.length / itemsPerPage);
+
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayChallenges();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayChallenges();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
     window.Challenges = {
         filterChallenges: filterChallenges,
         clearAllFilters: clearAllFilters,
@@ -1100,6 +1176,8 @@
         retryLocation: retryLocation,
         toggleCard: toggleCard,
         loadTeamChallengesCache: loadTeamChallengesCache,
+        nextPage: nextPage,
+        previousPage: previousPage,
         clearTeamChallengesCache: clearTeamChallengesCache,
         getChallengeFromCache: getChallengeFromCache
     };

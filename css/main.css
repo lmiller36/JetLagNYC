@@ -2,20 +2,20 @@
 
 /* CSS Custom Properties (Variables) */
 :root {
-    /* Material Design Color Palette */
-    --primary-color: #1976D2; /* Blue 700 - primary actions */
-    --primary-dark: #1565C0; /* Blue 800 - hover */
-    --secondary-color: #FF9800; /* Orange 500 - accents, secondary actions */
-    --secondary-dark: #F57C00; /* Orange 700 - hover */
-    --success-color: #4CAF50; /* Green 500 - success states */
-    --success-dark: #388E3C; /* Green 700 - hover */
-    --warning-color: #FFC107; /* Amber 500 - warnings, highlights */
-    --danger-color: #F44336; /* Red 500 - errors, alerts */
-    --navbar-color: #1976D2; /* Blue 700 - navbar */
-    --accent-warm: #FFF9C4; /* Yellow 100 - badges, highlights */
-    --light-color: #FAFAFA; /* Grey 50 - page backgrounds */
+    /* Warm Color Hunt Palette - https://colorhunt.co/palette/f6eec7f7d695ee8972d15a7c */
+    --primary-color: #EE8972; /* Coral Pink - primary actions */
+    --primary-dark: #E5735A; /* Darker coral for hover */
+    --secondary-color: #F7D695; /* Warm Yellow - accents, secondary actions */
+    --secondary-dark: #F4CA7B; /* Darker yellow for hover */
+    --success-color: #7EBF8E; /* Soft green - success states (similar to palette) */
+    --success-dark: #6AAF76; /* Darker green for hover */
+    --warning-color: #F7D695; /* Warm Yellow - warnings, highlights */
+    --danger-color: #D15A7C; /* Deep Rose - errors, alerts */
+    --navbar-color: #D15A7C; /* Deep Rose - navbar */
+    --accent-warm: #F6EEC7; /* Light Cream - badges, highlights */
+    --light-color: #FFF9F0; /* Off-white - page backgrounds */
     --card-bg: #FFFFFF; /* Pure white for cards */
-    --dark-color: #212121; /* Grey 900 - text */
+    --dark-color: #5D4E3E; /* Warm brown - text */
     --white: #ffffff;
     --black: #000000;
     
@@ -315,29 +315,65 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
     padding: 4px 8px;
     border-radius: 12px;
     font-size: var(--font-size-xs);
 }
 
 .team-label {
-    opacity: 0.9;
+    opacity: 1;
+    color: var(--white);
 }
 
 .team-name {
     font-weight: 600;
+    color: var(--white);
 }
 
 .team-score {
-    font-weight: 500;
-    opacity: 0.9;
+    font-weight: 600;
+    color: var(--white);
 }
 
 .user-info {
     grid-column: 3;
     grid-row: 1;
-    display: none; /* Hide on mobile by default */
+    display: none !important; /* Hide on mobile by default */
+}
+
+/* User info styling - must be here for proper loading */
+.user-info .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.user-info .user-name {
+    font-size: var(--font-size-sm);
+    color: #FFFFFF !important;
+    font-weight: 500;
+}
+
+.user-info .sign-out-btn {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    padding: var(--spacing-xs) var(--spacing-md) !important;
+    border-radius: var(--border-radius) !important;
+    cursor: pointer;
+    font-size: var(--font-size-sm) !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.user-info .sign-out-btn:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-color: var(--white) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
 }
 
 .nav-toggle {
@@ -420,6 +456,44 @@ body {
     display: flex;
 }
 
+/* Mobile user info in dropdown */
+.nav-user-info-mobile {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0;
+}
+
+.user-info-mobile {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.user-info-mobile .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.user-info-mobile .user-name {
+    flex: 1;
+    font-size: var(--font-size-base);
+    color: #FFFFFF !important;
+    font-weight: 500;
+}
+
+.user-info-mobile .sign-out-btn {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    padding: var(--spacing-xs) var(--spacing-md) !important;
+    border-radius: var(--border-radius) !important;
+    font-size: var(--font-size-sm) !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
 .nav-menu li {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -474,7 +548,14 @@ body {
     .user-info {
         grid-column: 3;
         grid-row: 1;
-        display: flex; /* Show on desktop */
+        display: flex !important; /* Show on desktop */
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-left: auto;
+    }
+
+    .nav-user-info-mobile {
+        display: none; /* Hide mobile user info on desktop */
     }
 
     .nav-toggle {
@@ -532,13 +613,15 @@ body {
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color); /* Golden */
-    color: var(--white);
+    background-color: var(--secondary-color); /* Warm Yellow */
+    color: var(--dark-color); /* Dark text for readability */
+    font-weight: 600;
 }
 
 .btn-secondary:hover,
 .btn-secondary:focus {
     background-color: var(--secondary-dark);
+    color: var(--dark-color);
 }
 
 /* Hero section */
