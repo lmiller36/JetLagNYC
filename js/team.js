@@ -167,10 +167,16 @@ function handleSignOut() {
  * Update UI based on auth and team state
  */
 function updateTeamUI() {
+    const loadingState = document.getElementById('loadingState');
     const notLoggedIn = document.getElementById('notLoggedIn');
     const teamManagement = document.getElementById('teamManagement');
     const noTeam = document.getElementById('noTeam');
     const hasTeam = document.getElementById('hasTeam');
+
+    // Hide loading state
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
 
     // Check if we have both user info AND a valid token
     const hasToken = typeof gapi !== 'undefined' && gapi?.client?.getToken() !== null;
