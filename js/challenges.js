@@ -44,6 +44,18 @@
         initializeChallenges();
     });
 
+    // Listen for GAPI initialization
+    window.addEventListener('gapiInitComplete', function() {
+        console.log('GAPI init complete, loading challenges...');
+        loadChallengesData();
+    });
+
+    // Listen for auth completion to reload data
+    window.addEventListener('sheetsAuthComplete', function() {
+        console.log('Auth complete, reloading challenges...');
+        loadChallengesData();
+    });
+
     function initializeChallenges() {
         // Get DOM elements
         searchInput = document.getElementById('challenge-search');
@@ -60,9 +72,6 @@
 
         // Set up event listeners
         setupEventListeners();
-
-        // Load challenges data
-        loadChallengesData();
     }
 
     function setupEventListeners() {
@@ -268,48 +277,20 @@
         try {
             showLoading();
 
-            // Try to fetch from server first, fallback to embedded data
-            try {
-                // Load all four challenge files
-                const [easyRes, mediumRes, hardRes, locationRes] = await Promise.all([
-                    fetch('../data/challenges-easy.json'),
-                    fetch('../data/challenges-medium.json'),
-                    fetch('../data/challenges-hard.json'),
-                    fetch('../data/challenges-location.json')
-                ]);
-
-                if (easyRes.ok && mediumRes.ok && hardRes.ok && locationRes.ok) {
-                    const [easyData, mediumData, hardData, locationData] = await Promise.all([
-                        easyRes.json(),
-                        mediumRes.json(),
-                        hardRes.json(),
-                        locationRes.json()
-                    ]);
-
-                    // Combine all challenges
-                    challengesData = [
-                        ...(easyData.challenges || []),
-                        ...(mediumData.challenges || []),
-                        ...(hardData.challenges || []),
-                        ...(locationData.challenges || [])
-                    ];
-
-                    filteredChallenges = [...challengesData];
-                    updateChipCounts();
-
-                    // Load team challenges cache for completion status
-                    await loadTeamChallengesCache();
-
-                    displayChallenges();
-                    updateResultsCount();
-                    return;
-                }
-            } catch (fetchError) {
-                console.log('Fetch failed, using embedded data:', fetchError.message);
+            // Check if GAPI is loaded and user is authenticated
+            if (typeof gapi === 'undefined' || !gapi.client || !gapi.client.getToken()) {
+                showSignInPrompt();
+                return;
             }
 
-            // Fallback to embedded data for file:// protocol
-            await loadEmbeddedChallengesData();
+            // Check if readSheetData function is available
+            if (!window.readSheetData) {
+                showSignInPrompt();
+                return;
+            }
+
+            // Load from Google Sheets
+            await loadFromGoogleSheets();
 
         } catch (error) {
             console.error('Error loading challenges data:', error);
@@ -317,24 +298,68 @@
         }
     }
 
-    async function loadEmbeddedChallengesData() {
-        // Embedded challenges data loaded from separate JS files
-        // These files are included via script tags in challenges.html
-        const easyData = window.CHALLENGES_EASY || { challenges: [] };
-        const mediumData = window.CHALLENGES_MEDIUM || { challenges: [] };
-        const hardData = window.CHALLENGES_HARD || { challenges: [] };
-        const locationData = window.CHALLENGES_LOCATION || { challenges: [] };
+    async function loadFromGoogleSheets() {
+        try {
+            console.log('Loading challenges from Google Sheets...');
 
-        challengesData = [...easyData.challenges, ...mediumData.challenges, ...hardData.challenges, ...locationData.challenges];
-        filteredChallenges = [...challengesData];
-        updateChipCounts();
+            // Read from Challenges sheet (columns: ID, Title, Description, Bonus Description, Category, Base Points, Location Restriction)
+            const sheetData = await readSheetData('Challenges!A2:G');
 
-        // Load team challenges cache for completion status BEFORE displaying
-        await loadTeamChallengesCache();
+            if (!sheetData || sheetData.length === 0) {
+                throw new Error('No data in Challenges sheet');
+            }
 
-        displayChallenges();
-        updateResultsCount();
+            // Transform sheet data to challenge objects
+            challengesData = sheetData.map((row) => {
+                const id = row[0] || '';
+                const title = row[1] || '';
+                const description = row[2] || '';
+                const bonusDescription = row[3] || '';
+                const category = (row[4] || 'easy').toLowerCase();
+                const basePoints = parseInt(row[5]) || 0;
+                const locationRestriction = row[6] || '';
+
+                return {
+                    id: id,
+                    title: title,
+                    description: description,
+                    bonusPoints: bonusDescription,
+                    category: category,
+                    points: basePoints,
+                    basePoints: basePoints, // Used in display
+                    locationSpecific: locationRestriction ? true : false,
+                    allowedNeighborhoods: locationRestriction ? locationRestriction.split(',').map(n => n.trim()) : []
+                };
+            });
+
+            filteredChallenges = [...challengesData];
+            updateChipCounts();
+
+            // Load team challenges cache for completion status
+            await loadTeamChallengesCache();
+
+            displayChallenges();
+            updateResultsCount();
+            console.log(`Loaded ${challengesData.length} challenges from Google Sheets`);
+
+        } catch (error) {
+            console.error('Error loading from Google Sheets:', error);
+            showError('Failed to load challenges from Google Sheets. Please try refreshing the page.');
+        }
     }
+
+    function showSignInPrompt() {
+        if (challengesContainer) {
+            challengesContainer.innerHTML = window.createSignInModal
+                ? window.createSignInModal('Sign in to view and complete challenges.')
+                : '<p>Please sign in to view challenges.</p>';
+        }
+        if (resultsCount) {
+            resultsCount.style.display = 'none'; // Hide the results count text
+        }
+    }
+
+    // Removed embedded data loading - now using Google Sheets only
 
     function filterChallenges() {
         // Get values from both mobile and desktop (prefer desktop if present, as it's being actively used)
@@ -428,31 +453,25 @@
         const categoryIcon = categoryIcons[challenge.category] || '📋';
 
         let bonusPointsHTML = '';
-        if (challenge.bonuses && challenge.bonuses.length > 0) {
-            bonusPointsHTML = `
-                <div class="bonus-points">
-                    <h4>Bonuses:</h4>
-                    ${challenge.bonuses.map(bonus => `
-                        <div class="bonus-item">
-                            <strong>+${bonus.points} points:</strong> ${bonus.criteria}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        } else if (challenge.bonusPoints) {
-            // Legacy support for old single bonusPoints format
-            bonusPointsHTML = `
-                <div class="bonus-points">
-                    <h4>Bonus: +${challenge.bonusPoints.points} points</h4>
-                    <p>${challenge.bonusPoints.criteria}</p>
-                </div>
-            `;
+        if (challenge.bonusPoints && challenge.bonusPoints.trim()) {
+            // bonusPoints is a comma-separated string from the sheet
+            const bonusList = challenge.bonusPoints.split(',').map(b => b.trim()).filter(b => b);
+            if (bonusList.length > 0) {
+                bonusPointsHTML = `
+                    <div class="bonus-points">
+                        <h4>Bonuses:</h4>
+                        <ul>
+                            ${bonusList.map(bonus => `<li>${escapeHTML(bonus)}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
         }
 
-        const locationRestrictionHTML = challenge.locationRestriction ? `
+        const locationRestrictionHTML = challenge.allowedNeighborhoods && challenge.allowedNeighborhoods.length > 0 ? `
             <div class="location-restriction">
                 <h4>Location Required</h4>
-                <p>Must be completed in: ${formatLocationRestriction(challenge.locationRestriction)}</p>
+                <p>Must be completed in: ${challenge.allowedNeighborhoods.join(', ')}</p>
             </div>
         ` : '';
 
@@ -614,6 +633,9 @@
 
     function updateResultsCount() {
         if (!resultsCount) return;
+
+        // Make sure it's visible (in case it was hidden by sign-in prompt)
+        resultsCount.style.display = '';
 
         const total = challengesData.length;
         const showing = filteredChallenges.length;
@@ -899,11 +921,6 @@
                         <small style="display: block; margin-top: 8px; color: #666; font-size: 13px;">Tap a neighborhood to add it. Bonus points calculated on submission based on first-time visits.</small>
                     </div>
 
-                    <div class="form-group">
-                        <label for="other-bonus">Other Bonus Points:</label>
-                        <input type="number" id="other-bonus" value="${existingData?.otherBonus || 0}" min="0">
-                    </div>
-                    
                     <div class="form-group">
                         <label for="photo-upload">Challenge Photos:</label>
                         <input type="file" id="photo-upload" accept="image/*" multiple style="display: none;">
@@ -1250,7 +1267,6 @@
 
             // Get comma-separated neighborhood names
             const neighborhoodNames = selectedNeighborhoods.join(', ');
-            const otherBonus = parseInt(document.getElementById('other-bonus').value) || 0;
             const notes = document.getElementById('notes').value;
 
             submitBtn.disabled = true;
@@ -1288,7 +1304,7 @@
                     challenge.title,
                     {
                         location: neighborhoodNames, // Comma-separated neighborhood names
-                        otherBonus,
+                        otherBonus: 0, // No longer used, set to 0
                         photoLinks,
                         notes
                     },
@@ -1306,7 +1322,7 @@
                         challengeName: challenge.title,
                         basePoints: challenge.basePoints,
                         location: neighborhoodNames || '',
-                        otherBonus: otherBonus,
+                        otherBonus: 0, // No longer used
                         photoLinks: photoLinks,
                         notes: notes
                     });

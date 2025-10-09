@@ -260,6 +260,13 @@ body {
     font-size: var(--font-size-base);
     color: var(--dark-color);
     background-color: var(--light-color); /* Warm cream background, not stark white */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
 }
 
 /* Container utility */

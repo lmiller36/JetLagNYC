@@ -11,6 +11,12 @@ let tokenExpirationTimer = null;
 function initAuth() {
     console.log('Initializing auth...');
 
+    // Listen for sheetsAuthComplete event from sign-in modals
+    window.addEventListener('sheetsAuthComplete', async () => {
+        console.log('sheetsAuthComplete event received, saving token...');
+        await handleAuthComplete();
+    });
+
     // Try to restore token from localStorage
     const savedToken = localStorage.getItem('scavenger_token');
     const savedUser = localStorage.getItem('scavenger_user');

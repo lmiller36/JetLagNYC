@@ -52,12 +52,9 @@
         // Check if GAPI is loaded
         if (typeof gapi === 'undefined' || !gapi.client) {
             console.log('GAPI not loaded yet, showing sign-in prompt');
-            tableContainer.innerHTML = `
-                <h4>Neighborhood Bonus Points</h4>
-                <div class="sign-in-prompt">
-                    <p>Please sign in to view neighborhood data</p>
-                </div>
-            `;
+            tableContainer.innerHTML = window.createSignInModal
+                ? window.createSignInModal('Sign in to view neighborhood bonus points.')
+                : '<h4>Neighborhood Bonus Points</h4><p>Please sign in to view neighborhood data</p>';
             return;
         }
 
@@ -65,14 +62,19 @@
         const token = gapi.client.getToken();
         if (!window.readSheetData || token === null) {
             console.log('User not authenticated, showing sign-in prompt');
-            tableContainer.innerHTML = `
-                <h4>Neighborhood Bonus Points</h4>
-                <div class="sign-in-prompt">
-                    <p>Please sign in to view neighborhood data</p>
-                </div>
-            `;
+            tableContainer.innerHTML = window.createSignInModal
+                ? window.createSignInModal('Sign in to view neighborhood bonus points.')
+                : '<h4>Neighborhood Bonus Points</h4><p>Please sign in to view neighborhood data</p>';
             return;
         }
+
+        // Show loading state
+        tableContainer.innerHTML = `
+            <h4>Neighborhood Bonus Points</h4>
+            <div style="text-align: center; padding: 40px 20px; color: #666;">
+                <p>Loading neighborhoods...</p>
+            </div>
+        `;
 
         try {
             console.log('Loading...');
