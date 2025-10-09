@@ -132,9 +132,14 @@
                 <!-- Results Summary -->
                 <div class="results-summary">
                     <p id="results-count">Loading challenges...</p>
-                    <button id="refresh-status-btn" class="btn-refresh-status" title="Refresh completion status">
-                        🔄 Refresh Status
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="refresh-status-btn" class="btn-refresh-status" title="Refresh completion status">
+                            🔄 Refresh Status
+                        </button>
+                        <button id="export-csv-btn" class="btn-refresh-status" title="Export challenges to CSV" style="display: none;">
+                            📥 Export CSV
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Challenges Grid -->

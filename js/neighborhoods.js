@@ -40,6 +40,18 @@
         setupEventListeners();
     }
 
+    /**
+     * Attach export button event listener
+     */
+    function attachExportButtonListener() {
+        const exportCsvBtn = document.getElementById('export-neighborhoods-csv-btn');
+        if (exportCsvBtn) {
+            exportCsvBtn.addEventListener('click', function() {
+                exportNeighborhoodsCSV();
+            });
+        }
+    }
+
     async function populateNeighborhoodsTable() {
         const tableContainer = document.querySelector('.neighborhoods-table');
         if (!tableContainer) {
@@ -105,7 +117,16 @@
                 { key: 'bronx', name: 'Bronx' },
                 { key: 'staten island', name: 'Staten Island' }
             ];
+
+            // Check if we should show export button (localhost only)
+            const isLocalhost = window.location.hostname === 'localhost' ||
+                               window.location.hostname === '127.0.0.1' ||
+                               window.location.hostname === '';
+
             let html = '<h4>Neighborhood Bonus Points</h4>';
+            if (isLocalhost) {
+                html += '<button id="export-neighborhoods-csv-btn" class="btn-refresh-status" style="margin-bottom: 20px;" title="Export neighborhoods to CSV">📥 Export CSV</button>';
+            }
 
             boroughOrder.forEach(borough => {
                 if (boroughGroups[borough.key] && boroughGroups[borough.key].length > 0) {
@@ -129,6 +150,11 @@
 
             tableContainer.innerHTML = html;
             console.log('Neighborhoods table populated successfully');
+
+            // Attach export CSV button event listener (if button exists)
+            if (isLocalhost) {
+                attachExportButtonListener();
+            }
         } catch (error) {
             console.error('Error loading neighborhoods table:', error);
             tableContainer.innerHTML = `
@@ -149,5 +175,70 @@
             });
         });
     }
-    
+
+    /**
+     * Export neighborhoods data to CSV
+     */
+    async function exportNeighborhoodsCSV() {
+        try {
+            // Check if data is available
+            if (!window.readSheetData) {
+                alert('Please sign in first to export neighborhoods data');
+                return;
+            }
+
+            // Fetch fresh data from sheets
+            const sheetData = await readSheetData('Neighborhoods!A2:C');
+
+            if (!sheetData || sheetData.length === 0) {
+                alert('No neighborhoods data available to export');
+                return;
+            }
+
+            // CSV header
+            const headers = ['name', 'borough', 'points'];
+            const csvRows = [headers.join(',')];
+
+            // Add data rows
+            sheetData.forEach(row => {
+                const rowData = [
+                    escapeCSV(row[0] || ''),
+                    escapeCSV(row[1] || ''),
+                    row[2] || 0
+                ];
+                csvRows.push(rowData.join(','));
+            });
+
+            const csvContent = csvRows.join('\n');
+
+            // Download the CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'neighborhoods.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            console.log('Exported neighborhoods CSV');
+        } catch (error) {
+            console.error('Error exporting neighborhoods CSV:', error);
+            alert('Error exporting neighborhoods data: ' + error.message);
+        }
+    }
+
+    /**
+     * Escape CSV field
+     */
+    function escapeCSV(field) {
+        if (field === null || field === undefined) return '';
+        const str = String(field);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    }
+
 })();

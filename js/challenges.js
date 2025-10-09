@@ -261,6 +261,19 @@
             });
         }
 
+        // Export CSV button (automatically enabled on localhost)
+        const ENABLE_CSV_EXPORT = window.location.hostname === 'localhost' ||
+                                   window.location.hostname === '127.0.0.1' ||
+                                   window.location.hostname === '';
+
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        if (exportCsvBtn && ENABLE_CSV_EXPORT) {
+            exportCsvBtn.style.display = 'block';
+            exportCsvBtn.addEventListener('click', function() {
+                exportChallengesCSV();
+            });
+        }
+
         // Listen for team changes to clear cache
         window.addEventListener('teamChanged', function() {
             clearTeamChallengesCache();
@@ -323,10 +336,11 @@
                     id: id,
                     title: title,
                     description: description,
-                    bonusPoints: bonusDescription,
+                    bonusDescription: bonusDescription,
                     category: category,
                     points: basePoints,
                     basePoints: basePoints, // Used in display
+                    locationRestriction: locationRestriction,
                     locationSpecific: locationRestriction ? true : false,
                     allowedNeighborhoods: locationRestriction ? locationRestriction.split(',').map(n => n.trim()) : []
                 };
@@ -1396,6 +1410,61 @@
         await refreshLocation(button);
     }
 
+    /**
+     * Export challenges data to CSV
+     */
+    function exportChallengesCSV() {
+        if (!challengesData || challengesData.length === 0) {
+            alert('No challenges data available to export');
+            return;
+        }
+
+        // CSV header
+        const headers = ['id', 'title', 'description', 'bonusDescription', 'category', 'points', 'locationRestriction'];
+        const csvRows = [headers.join(',')];
+
+        // Add data rows
+        challengesData.forEach(challenge => {
+            const row = [
+                escapeCSV(challenge.id),
+                escapeCSV(challenge.title),
+                escapeCSV(challenge.description),
+                escapeCSV(challenge.bonusDescription),
+                escapeCSV(challenge.category),
+                challenge.points || 0,
+                escapeCSV(challenge.locationRestriction)
+            ];
+            csvRows.push(row.join(','));
+        });
+
+        const csvContent = csvRows.join('\n');
+
+        // Download the CSV
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'challenges.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log('Exported challenges CSV');
+    }
+
+    /**
+     * Escape CSV field
+     */
+    function escapeCSV(field) {
+        if (field === null || field === undefined) return '';
+        const str = String(field);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    }
+
     // Expose functions for potential external use
     window.Challenges = {
         filterChallenges: filterChallenges,
@@ -1409,6 +1478,7 @@
         toggleCard: toggleCard,
         loadTeamChallengesCache: loadTeamChallengesCache,
         clearTeamChallengesCache: clearTeamChallengesCache,
-        getChallengeFromCache: getChallengeFromCache
+        getChallengeFromCache: getChallengeFromCache,
+        exportChallengesCSV: exportChallengesCSV
     };
 })();

@@ -1,0 +1,10 @@
+# CSV data exports (generated locally, not committed)
+data/challenges.csv
+data/neighborhoods.csv
+
+# Generated markdown
+CHALLENGES.md
+
+# OS files
+.DS_Store
+Thumbs.db
