@@ -922,10 +922,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="photo-upload">Challenge Photos:</label>
-                        <input type="file" id="photo-upload" accept="image/*" multiple style="display: none;">
+                        <label for="photo-upload">Challenge Photos/Videos:</label>
+                        <input type="file" id="photo-upload" accept="image/*,video/*" multiple style="display: none;">
                         <button type="button" class="btn btn-secondary" onclick="document.getElementById('photo-upload').click()">
-                            📷 Select Photos
+                            📷 Select Photos/Videos
                         </button>
                         <div id="photo-preview" class="photo-preview-grid"></div>
                     </div>
@@ -1228,25 +1228,32 @@
             // Wait for all photos to load
             await Promise.all(photoPromises);
 
-            // Show newly selected photos
-            selectedPhotos.forEach((photo, index) => {
+            // Show newly selected photos/videos
+            selectedPhotos.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const photoItem = document.createElement('div');
                     photoItem.className = 'photo-preview-item';
+
+                    // Check if file is a video
+                    const isVideo = file.type.startsWith('video/');
+
                     photoItem.innerHTML = `
-                        <img src="${e.target.result}" alt="New photo ${index + 1}">
+                        ${isVideo
+                            ? `<video src="${e.target.result}" controls style="width: 100%; height: 100%; object-fit: cover;"></video>`
+                            : `<img src="${e.target.result}" alt="New photo ${index + 1}">`
+                        }
                         <button type="button" class="remove-photo" data-new-index="${index}">×</button>
                     `;
                     photoPreview.appendChild(photoItem);
 
-                    // Add remove handler for new photo
+                    // Add remove handler for new photo/video
                     photoItem.querySelector('.remove-photo').addEventListener('click', () => {
                         selectedPhotos.splice(index, 1);
                         renderPhotoPreview();
                     });
                 };
-                reader.readAsDataURL(photo);
+                reader.readAsDataURL(file);
             });
         }
 
