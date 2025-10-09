@@ -164,16 +164,15 @@ async function appendSheetData(range, values) {
  * @returns {Promise<Array>} Array of challenge objects
  */
 async function getTeamChallenges(teamName) {
-    const data = await readSheetData(`${teamName}!A2:H`);
+    const data = await readSheetData(`${teamName}!A2:G`);
     return data.map(row => ({
         challengeId: row[0] || '',
         challengeName: row[1] || '',
         basePoints: parseInt(row[2]) || 0,
-        location: row[3] || '',
-        neighborhoodBonus: parseInt(row[4]) || 0,
-        otherBonus: parseInt(row[5]) || 0,
-        photoLinks: row[6] || '',
-        notes: row[7] || ''
+        location: row[3] || '', // Comma-separated neighborhoods
+        otherBonus: parseInt(row[4]) || 0,
+        photoLinks: row[5] || '',
+        notes: row[6] || ''
     }));
 }
 
@@ -189,13 +188,12 @@ async function updateTeamChallenge(teamName, rowNumber, challengeData) {
         challengeData.challengeName || '',
         challengeData.basePoints || 0,
         challengeData.location || '',
-        challengeData.neighborhoodBonus || 0,
         challengeData.otherBonus || 0,
         challengeData.photoLinks || '',
         challengeData.notes || ''
     ];
 
-    await writeSheetData(`${teamName}!A${rowNumber}:H${rowNumber}`, [row]);
+    await writeSheetData(`${teamName}!A${rowNumber}:G${rowNumber}`, [row]);
 }
 
 /**
@@ -214,23 +212,22 @@ function formatPhotoLinksForSheets(photoLinks) {
 }
 
 async function updateChallengeByName(teamName, challengeName, updateData) {
-    const challenges = await readSheetData(`${teamName}!A2:H`);
+    const challenges = await readSheetData(`${teamName}!A2:G`);
 
     for (let i = 0; i < challenges.length; i++) {
-        if (challenges[i][1] === challengeName) { // challengeName is now in column B (index 1)
+        if (challenges[i][1] === challengeName) { // challengeName is in column B (index 1)
             const rowNumber = i + 2; // +2 for header row and 0-indexing
             const row = [
                 challenges[i][0] || '', // challengeId
                 challengeName,
                 challenges[i][2] || 0, // basePoints
-                updateData.location || challenges[i][3] || '',
-                updateData.neighborhoodBonus !== undefined ? updateData.neighborhoodBonus : (challenges[i][4] || 0),
-                updateData.otherBonus !== undefined ? updateData.otherBonus : (challenges[i][5] || 0),
-                formatPhotoLinksForSheets(updateData.photoLinks) || challenges[i][6] || '',
-                updateData.notes || challenges[i][7] || ''
+                updateData.location !== undefined ? updateData.location : (challenges[i][3] || ''),
+                updateData.otherBonus !== undefined ? updateData.otherBonus : (challenges[i][4] || 0),
+                formatPhotoLinksForSheets(updateData.photoLinks) || challenges[i][5] || '',
+                updateData.notes || challenges[i][6] || ''
             ];
 
-            await writeSheetData(`${teamName}!A${rowNumber}:H${rowNumber}`, [row]);
+            await writeSheetData(`${teamName}!A${rowNumber}:G${rowNumber}`, [row]);
             return true;
         }
     }
@@ -250,13 +247,12 @@ async function addChallengeToTeam(teamName, challengeData) {
             challengeData.title || challengeData.name || '',
             challengeData.basePoints || 0,
             challengeData.location || '',
-            challengeData.neighborhoodBonus || 0,
             challengeData.otherBonus || 0,
             challengeData.photoLinks || '',
             challengeData.notes || ''
         ];
 
-        await appendSheetData(`${teamName}!A:H`, [row]);
+        await appendSheetData(`${teamName}!A:G`, [row]);
         return true;
     } catch (err) {
         console.error('Error adding challenge to team:', err);
@@ -311,31 +307,50 @@ async function addPhotoToChallenge(teamName, challengeName, photoLink) {
 }
 
 /**
- * Calculate total score for a team
+ * Calculate total score for a team (with on-the-fly neighborhood bonus calculation)
  * @param {string} teamName - Name of the team (sheet name)
  * @returns {Promise<Object>} Score breakdown
  */
 async function calculateTeamScore(teamName) {
-    const challenges = await readSheetData(`${teamName}!A2:H`);
+    const challenges = await readSheetData(`${teamName}!A2:G`);
+
+    // Get neighborhood points mapping
+    const neighborhoodsData = await readSheetData('Neighborhoods!A2:C');
+    const neighborhoodsMap = neighborhoodsData.reduce((acc, row) => {
+        acc[row[0]] = parseInt(row[2]) || 0;
+        return acc;
+    }, {});
 
     let totalBasePoints = 0;
     let totalNeighborhoodBonus = 0;
     let totalOtherBonus = 0;
     let completedChallenges = 0;
 
+    // Track visited neighborhoods as we iterate (in order)
+    const visitedNeighborhoods = new Set();
+
     challenges.forEach(row => {
         const challengeId = row[0] || '';
         const basePoints = parseInt(row[2]) || 0;
         const location = row[3] || '';
-        const neighborhoodBonus = parseInt(row[4]) || 0;
-        const otherBonus = parseInt(row[5]) || 0;
+        const otherBonus = parseInt(row[4]) || 0;
 
         // Challenge is completed if it exists in the sheet (has a challengeId)
         if (challengeId) {
             completedChallenges++;
             totalBasePoints += basePoints;
-            totalNeighborhoodBonus += neighborhoodBonus;
             totalOtherBonus += otherBonus;
+
+            // Calculate neighborhood bonus on-the-fly
+            if (location) {
+                const neighborhoods = location.split(',').map(n => n.trim()).filter(n => n);
+                neighborhoods.forEach(name => {
+                    if (!visitedNeighborhoods.has(name) && neighborhoodsMap[name]) {
+                        totalNeighborhoodBonus += neighborhoodsMap[name];
+                        visitedNeighborhoods.add(name);
+                    }
+                });
+            }
         }
     });
 
@@ -405,10 +420,10 @@ async function initializeTeamSheet(teamName, challengeList = []) {
         await createSheet(teamName);
     }
 
-    const header = [['Challenge ID', 'Challenge Name', 'Base Points', 'Location', 'Neighborhood Bonus', 'Other Bonus', 'Photo Links', 'Notes']];
+    const header = [['Challenge ID', 'Challenge Name', 'Base Points', 'Location', 'Other Bonus', 'Photo Links', 'Notes']];
 
     // Write header
-    await writeSheetData(`${teamName}!A1:H1`, header);
+    await writeSheetData(`${teamName}!A1:G1`, header);
 
     // Only write challenges if provided
     if (challengeList && challengeList.length > 0) {
@@ -417,14 +432,14 @@ async function initializeTeamSheet(teamName, challengeList = []) {
             challenge.title || challenge.name || challenge,
             challenge.basePoints || 0,
             '', // location
-            0,  // neighborhood bonus
             0,  // other bonus
             '', // photo links
             ''  // notes
         ]);
-        await writeSheetData(`${teamName}!A2:H${rows.length + 1}`, rows);
+        await writeSheetData(`${teamName}!A2:G${rows.length + 1}`, rows);
     }
 }
+
 
 // Export functions for use in other scripts (export immediately, not in load event)
 window.SheetsAPI = {

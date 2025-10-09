@@ -64,7 +64,14 @@ function initTeamPage() {
     if (joinTeamBtn) joinTeamBtn.addEventListener('click', joinTeam);
     if (createTeamBtn) createTeamBtn.addEventListener('click', createTeam);
     if (leaveTeamBtn) leaveTeamBtn.addEventListener('click', leaveTeam);
-    if (refreshScoreBtn) refreshScoreBtn.addEventListener('click', loadTeamScore);
+    if (refreshScoreBtn) refreshScoreBtn.addEventListener('click', () => {
+        // Reset loaded flag to force reload
+        scoreLoaded = false;
+        challengesLoaded = false;
+        loadTeamScore();
+        loadTeamChallenges();
+        window.toast?.success('Refreshing data from sheets...');
+    });
 
     // Listen for auth events
     window.addEventListener('userSignedIn', handleSignIn);
@@ -449,6 +456,54 @@ async function loadTeamScore(retryCount = 0) {
 }
 
 /**
+ * Load neighborhoods data from master sheet
+ */
+async function loadNeighborhoodsData() {
+    try {
+        const data = await window.SheetsAPI.readSheetData('Neighborhoods!A2:C');
+        return data.map(row => ({
+            name: row[0] || '',
+            borough: row[1] || '',
+            points: parseInt(row[2]) || 0
+        }));
+    } catch (err) {
+        console.error('Error loading neighborhoods data:', err);
+        return [];
+    }
+}
+
+/**
+ * Calculate which neighborhoods contributed bonus for a specific challenge
+ * Based on the order of challenges in the sheet (first occurrence gets bonus)
+ * @param {Array} allChallenges - All challenges from sheet in order
+ * @param {number} currentIndex - Index of current challenge
+ * @param {Array} neighborhoods - Array of neighborhood names for this challenge
+ * @param {Object} neighborhoodsMap - Map of neighborhood name to points
+ * @returns {Array} Array of {name, points} for neighborhoods that contributed bonus
+ */
+function calculateNeighborhoodBonusBreakdown(allChallenges, currentIndex, neighborhoods, neighborhoodsMap) {
+    if (!neighborhoods || neighborhoods.length === 0) return [];
+
+    // Track which neighborhoods appeared in challenges BEFORE this one
+    const visitedBefore = new Set();
+    for (let i = 0; i < currentIndex; i++) {
+        const challenge = allChallenges[i];
+        if (challenge.location) {
+            const prevNeighborhoods = challenge.location.split(',').map(n => n.trim()).filter(n => n);
+            prevNeighborhoods.forEach(n => visitedBefore.add(n));
+        }
+    }
+
+    // Return only neighborhoods that were NOT visited before (first-time visits)
+    return neighborhoods
+        .filter(name => !visitedBefore.has(name) && neighborhoodsMap[name])
+        .map(name => ({
+            name: name,
+            points: neighborhoodsMap[name]
+        }));
+}
+
+/**
  * Load and display team challenges
  */
 async function loadTeamChallenges(retryCount = 0) {
@@ -496,29 +551,105 @@ async function loadTeamChallenges(retryCount = 0) {
     }
 
     try {
-        const challenges = await window.SheetsAPI.getTeamChallenges(currentTeam);
+        // Load neighborhoods data and challenges in parallel
+        const [neighborhoodsData, challenges] = await Promise.all([
+            loadNeighborhoodsData(),
+            window.SheetsAPI.getTeamChallenges(currentTeam)
+        ]);
 
         if (challenges.length === 0) {
             progressDiv.innerHTML = '<div class="score-loading"><p>No challenges yet. Complete some challenges to see them here!</p></div>';
             return;
         }
 
-        progressDiv.innerHTML = challenges.map(challenge => {
+        // Create neighborhoods map for quick lookup
+        const neighborhoodsMap = neighborhoodsData.reduce((acc, n) => {
+            acc[n.name] = n.points;
+            return acc;
+        }, {});
+
+        // Process all challenges and calculate bonuses synchronously (based on order)
+        const challengeHTMLArray = challenges.map((challenge, index) => {
             const isCompleted = challenge.challengeId !== '';
-            const totalPoints = challenge.basePoints + challenge.neighborhoodBonus + challenge.otherBonus;
+
+            // Parse neighborhoods if present
+            const neighborhoods = challenge.location ? challenge.location.split(',').map(n => n.trim()).filter(n => n) : [];
+
+            // Calculate neighborhood bonus breakdown based on challenges that came before
+            const neighborhoodBonusBreakdown = calculateNeighborhoodBonusBreakdown(
+                challenges,
+                index,
+                neighborhoods,
+                neighborhoodsMap
+            );
+
+            // Calculate total neighborhood bonus
+            const neighborhoodBonus = neighborhoodBonusBreakdown.reduce((sum, n) => sum + n.points, 0);
+            const hasNeighborhoodBonus = neighborhoodBonus > 0 && neighborhoods.length > 0;
+
+            // Calculate total points
+            const totalPoints = challenge.basePoints + neighborhoodBonus + challenge.otherBonus;
+
+            // Build expandable details HTML
+            let detailsHTML = '';
+            if (isCompleted && (hasNeighborhoodBonus || challenge.otherBonus > 0)) {
+                detailsHTML = `
+                    <div class="challenge-details" id="details-${index}" style="display: none;">
+                        <div class="challenge-breakdown">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Base Points:</span>
+                                <span class="breakdown-value">${challenge.basePoints} pts</span>
+                            </div>
+                            ${hasNeighborhoodBonus && neighborhoodBonusBreakdown.length > 0 ? `
+                                <div class="breakdown-item highlight">
+                                    <span class="breakdown-label">Neighborhood Bonus:</span>
+                                    <span class="breakdown-value">+${neighborhoodBonus} pts</span>
+                                </div>
+                                <div class="neighborhoods-list">
+                                    ${neighborhoodBonusBreakdown.map(n => `
+                                        <div class="neighborhood-chip">📍 ${escapeHTML(n.name)} <span style="font-weight: 600; margin-left: 4px;">+${n.points}</span></div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                            ${challenge.otherBonus > 0 ? `
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Other Bonus:</span>
+                                    <span class="breakdown-value">+${challenge.otherBonus} pts</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const expandIcon = (isCompleted && (hasNeighborhoodBonus || challenge.otherBonus > 0))
+                ? `<span class="expand-icon" style="margin-left: 8px; opacity: 0.6;">▼</span>`
+                : '';
 
             return `
-                <div class="challenge-item ${isCompleted ? 'completed' : ''}">
-                    <span class="challenge-name">${escapeHTML(challenge.challengeName)}</span>
-                    <div class="challenge-status">
-                        ${isCompleted ? `<span>${totalPoints} pts</span>` : `<span>${challenge.basePoints} base pts</span>`}
-                        <span class="status-badge ${isCompleted ? 'completed' : 'pending'}">
-                            ${isCompleted ? 'Completed' : 'Pending'}
-                        </span>
+                <div class="challenge-card ${isCompleted ? 'completed' : ''}"
+                     ${detailsHTML ? `onclick="window.Team.toggleChallengeDetails(${index})"` : ''}
+                     style="cursor: ${detailsHTML ? 'pointer' : 'default'};">
+                    <div class="challenge-main">
+                        <div class="challenge-info">
+                            <span class="challenge-name">${escapeHTML(challenge.challengeName)}${expandIcon}</span>
+                        </div>
+                        <div class="challenge-score">
+                            ${isCompleted ? `
+                                <span class="points-total">${totalPoints} pts</span>
+                                <span class="status-badge completed">✓</span>
+                            ` : `
+                                <span class="points-base">${challenge.basePoints} pts</span>
+                                <span class="status-badge pending">—</span>
+                            `}
+                        </div>
                     </div>
+                    ${detailsHTML}
                 </div>
             `;
-        }).join('');
+        });
+
+        progressDiv.innerHTML = challengeHTMLArray.join('');
 
         // Mark as loaded
         challengesLoaded = true;
@@ -540,6 +671,26 @@ function getCurrentTeam() {
     return currentTeam;
 }
 
+/**
+ * Toggle challenge details visibility
+ * @param {number} index - Index of the challenge card
+ */
+function toggleChallengeDetails(index) {
+    const details = document.getElementById(`details-${index}`);
+    if (!details) return;
+
+    const card = details.closest('.challenge-card');
+    const icon = card?.querySelector('.expand-icon');
+
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+        if (icon) icon.textContent = '▲';
+    } else {
+        details.style.display = 'none';
+        if (icon) icon.textContent = '▼';
+    }
+}
+
 // Initialize on page load
 window.addEventListener('load', initTeamPage);
 
@@ -547,5 +698,6 @@ window.addEventListener('load', initTeamPage);
 window.Team = {
     getCurrentTeam,
     loadTeamScore,
-    loadTeamChallenges
+    loadTeamChallenges,
+    toggleChallengeDetails
 };

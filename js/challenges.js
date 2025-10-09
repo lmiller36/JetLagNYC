@@ -55,10 +55,7 @@
         resultsCount = document.getElementById('results-count');
         noResults = document.getElementById('no-results');
 
-        // New chip-based UI elements
-        searchToggle = document.getElementById('search-toggle');
-        moreFiltersBtn = document.getElementById('more-filters');
-        applyFiltersBtn = document.getElementById('apply-filters');
+        // New unified filter UI elements
         filterChips = document.querySelectorAll('.filter-chip');
 
         // Set up event listeners
@@ -69,109 +66,176 @@
     }
 
     function setupEventListeners() {
-        // Filter chips
-        if (filterChips && filterChips.length > 0) {
-            console.log('Setting up filter chip listeners for', filterChips.length, 'chips');
-            filterChips.forEach(chip => {
-                chip.addEventListener('click', function() {
-                    const category = this.getAttribute('data-category');
-                    console.log('Filter chip clicked:', category);
-                    setActiveChip(category);
-                    currentCategory = category;
-                    filterChallenges();
-                });
-            });
-        } else {
-            console.warn('No filter chips found!');
-        }
+        // ===== UNIFIED FILTER SYSTEM =====
 
-        // Bottom sheet setup
-        const searchSheet = document.getElementById('search-sheet');
-        const searchOverlay = document.getElementById('search-overlay');
-        const searchSheetClose = document.getElementById('search-sheet-close');
-        const filtersSheet = document.getElementById('filters-sheet');
-        const filtersOverlay = document.getElementById('filters-overlay');
-        const filtersSheetClose = document.getElementById('filters-sheet-close');
+        // Mobile: FAB and Bottom Sheet
+        const mobileFAB = document.getElementById('mobile-search-fab');
+        const mobileSheet = document.getElementById('mobile-filters-sheet');
+        const mobileOverlay = document.getElementById('mobile-filters-overlay');
+        const mobileClose = document.getElementById('mobile-filters-close');
+        const mobileSearch = document.getElementById('mobile-search');
+        const mobileCompletionFilter = document.getElementById('mobile-completion-filter');
+        const mobilePointsSort = document.getElementById('mobile-points-sort');
+        const mobileClearBtn = document.getElementById('mobile-clear-filters');
+        const mobileApplyBtn = document.getElementById('mobile-apply-filters');
+        const mobileFilterChips = document.querySelectorAll('#mobile-filters-sheet .filter-chip');
 
-        // Search toggle - opens bottom sheet
-        if (searchToggle) {
-            searchToggle.addEventListener('click', function() {
-                searchSheet.classList.add('active');
-                searchOverlay.classList.add('active');
-                // Small delay to ensure the sheet is visible before focusing
+        // Desktop: Always-visible filters
+        const desktopSearch = document.getElementById('desktop-search');
+        const desktopCompletionFilter = document.getElementById('desktop-completion-filter');
+        const desktopPointsSort = document.getElementById('desktop-points-sort');
+        const desktopFilterChips = document.querySelectorAll('.filter-chips-desktop .filter-chip');
+
+        // Mobile FAB - open bottom sheet
+        if (mobileFAB) {
+            mobileFAB.addEventListener('click', function() {
+                mobileSheet.classList.add('active');
+                mobileOverlay.classList.add('active');
                 setTimeout(() => {
-                    if (searchInput) searchInput.focus();
+                    if (mobileSearch) mobileSearch.focus();
                 }, 300);
             });
         }
 
-        // Close search sheet
-        function closeSearchSheet() {
-            searchSheet.classList.remove('active');
-            searchOverlay.classList.remove('active');
+        // Close mobile sheet
+        function closeMobileSheet() {
+            mobileSheet.classList.remove('active');
+            mobileOverlay.classList.remove('active');
         }
 
-        if (searchSheetClose) {
-            searchSheetClose.addEventListener('click', closeSearchSheet);
+        if (mobileClose) {
+            mobileClose.addEventListener('click', closeMobileSheet);
         }
 
-        if (searchOverlay) {
-            searchOverlay.addEventListener('click', closeSearchSheet);
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', closeMobileSheet);
         }
 
-        // More filters toggle - opens bottom sheet
-        if (moreFiltersBtn) {
-            moreFiltersBtn.addEventListener('click', function() {
-                filtersSheet.classList.add('active');
-                filtersOverlay.classList.add('active');
+        // Mobile: Filter chips
+        if (mobileFilterChips && mobileFilterChips.length > 0) {
+            mobileFilterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+
+                    // Toggle logic
+                    if (currentCategory === category && category !== 'all') {
+                        setActiveChip('all', mobileFilterChips);
+                        currentCategory = 'all';
+                    } else {
+                        setActiveChip(category, mobileFilterChips);
+                        currentCategory = category;
+                    }
+
+                    // Sync desktop chips
+                    setActiveChip(currentCategory, desktopFilterChips);
+                });
             });
         }
 
-        // Close filters sheet
-        function closeFiltersSheet() {
-            filtersSheet.classList.remove('active');
-            filtersOverlay.classList.remove('active');
+        // Desktop: Filter chips
+        if (desktopFilterChips && desktopFilterChips.length > 0) {
+            desktopFilterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+
+                    // Toggle logic
+                    if (currentCategory === category && category !== 'all') {
+                        setActiveChip('all', desktopFilterChips);
+                        currentCategory = 'all';
+                    } else {
+                        setActiveChip(category, desktopFilterChips);
+                        currentCategory = category;
+                    }
+
+                    // Sync mobile chips and apply immediately
+                    setActiveChip(currentCategory, mobileFilterChips);
+                    filterChallenges();
+                });
+            });
         }
 
-        if (filtersSheetClose) {
-            filtersSheetClose.addEventListener('click', closeFiltersSheet);
+        // Mobile: Search input
+        if (mobileSearch) {
+            let searchTimeout;
+            mobileSearch.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (desktopSearch) {
+                        desktopSearch.value = mobileSearch.value;
+                    }
+                }, 300);
+            });
         }
 
-        if (filtersOverlay) {
-            filtersOverlay.addEventListener('click', closeFiltersSheet);
+        // Desktop: Search input (apply immediately)
+        if (desktopSearch) {
+            let searchTimeout;
+            desktopSearch.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (mobileSearch) {
+                        mobileSearch.value = desktopSearch.value;
+                    }
+                    filterChallenges();
+                }, 300);
+            });
         }
 
-        // Apply filters button - close sheet and apply
-        if (applyFiltersBtn) {
-            applyFiltersBtn.addEventListener('click', function() {
-                closeFiltersSheet();
+        // Mobile: Completion filter
+        if (mobileCompletionFilter) {
+            mobileCompletionFilter.addEventListener('change', function() {
+                if (desktopCompletionFilter) {
+                    desktopCompletionFilter.value = this.value;
+                }
+            });
+        }
+
+        // Desktop: Completion filter (apply immediately)
+        if (desktopCompletionFilter) {
+            desktopCompletionFilter.addEventListener('change', function() {
+                if (mobileCompletionFilter) {
+                    mobileCompletionFilter.value = this.value;
+                }
                 filterChallenges();
             });
         }
 
-        if (searchInput) {
-            // Debounced search input
-            let searchTimeout;
-            searchInput.addEventListener('input', function () {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(filterChallenges, 300);
+        // Mobile: Points sort
+        if (mobilePointsSort) {
+            mobilePointsSort.addEventListener('change', function() {
+                if (desktopPointsSort) {
+                    desktopPointsSort.value = this.value;
+                }
             });
         }
 
-        if (categoryFilter) {
-            categoryFilter.addEventListener('change', filterChallenges);
+        // Desktop: Points sort (apply immediately)
+        if (desktopPointsSort) {
+            desktopPointsSort.addEventListener('change', function() {
+                if (mobilePointsSort) {
+                    mobilePointsSort.value = this.value;
+                }
+                filterChallenges();
+            });
         }
 
-        if (pointsSort) {
-            pointsSort.addEventListener('change', filterChallenges);
+        // Mobile: Clear all filters
+        if (mobileClearBtn) {
+            mobileClearBtn.addEventListener('click', function() {
+                clearAllFilters();
+                // Sync to desktop
+                if (desktopSearch) desktopSearch.value = '';
+                if (desktopCompletionFilter) desktopCompletionFilter.value = 'all';
+                if (desktopPointsSort) desktopPointsSort.value = 'default';
+            });
         }
 
-        if (completionFilter) {
-            completionFilter.addEventListener('change', filterChallenges);
-        }
-
-        if (clearFiltersBtn) {
-            clearFiltersBtn.addEventListener('click', clearAllFilters);
+        // Mobile: Apply filters and close
+        if (mobileApplyBtn) {
+            mobileApplyBtn.addEventListener('click', function() {
+                filterChallenges();
+                closeMobileSheet();
+            });
         }
 
         // Refresh status button
@@ -273,10 +337,18 @@
     }
 
     function filterChallenges() {
-        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        // Get values from both mobile and desktop (prefer desktop if present, as it's being actively used)
+        const desktopSearch = document.getElementById('desktop-search');
+        const mobileSearch = document.getElementById('mobile-search');
+        const desktopCompletion = document.getElementById('desktop-completion-filter');
+        const mobileCompletion = document.getElementById('mobile-completion-filter');
+        const desktopPoints = document.getElementById('desktop-points-sort');
+        const mobilePoints = document.getElementById('mobile-points-sort');
+
+        const searchTerm = (desktopSearch?.value || mobileSearch?.value || '').toLowerCase().trim();
         const selectedCategory = currentCategory || 'all';
-        const sortOrder = pointsSort ? pointsSort.value : 'default';
-        const completionStatus = completionFilter ? completionFilter.value : 'all';
+        const sortOrder = desktopPoints?.value || mobilePoints?.value || 'default';
+        const completionStatus = desktopCompletion?.value || mobileCompletion?.value || 'all';
 
         // Start with all challenges
         filteredChallenges = [...challengesData];
@@ -463,8 +535,11 @@
     }
 
     // Set active filter chip
-    function setActiveChip(category) {
-        filterChips.forEach(chip => {
+    function setActiveChip(category, chipList = null) {
+        // If no chipList provided, update all chips (both mobile and desktop)
+        const chipsToUpdate = chipList || document.querySelectorAll('.filter-chip');
+
+        chipsToUpdate.forEach(chip => {
             if (chip.getAttribute('data-category') === category) {
                 chip.classList.add('active');
             } else {
@@ -473,7 +548,7 @@
         });
     }
 
-    // Update chip counts
+    // Update chip counts (both mobile and desktop)
     function updateChipCounts() {
         if (!challengesData || challengesData.length === 0) return;
 
@@ -485,11 +560,31 @@
             'location-specific': challengesData.filter(c => c.category === 'location-specific').length
         };
 
-        document.getElementById('count-all').textContent = `(${counts.all})`;
-        document.getElementById('count-easy').textContent = `(${counts.easy})`;
-        document.getElementById('count-medium').textContent = `(${counts.medium})`;
-        document.getElementById('count-hard').textContent = `(${counts.hard})`;
-        document.getElementById('count-location').textContent = `(${counts['location-specific']})`;
+        // Update desktop counts
+        const desktopCountAll = document.getElementById('desktop-count-all');
+        const desktopCountEasy = document.getElementById('desktop-count-easy');
+        const desktopCountMedium = document.getElementById('desktop-count-medium');
+        const desktopCountHard = document.getElementById('desktop-count-hard');
+        const desktopCountLocation = document.getElementById('desktop-count-location');
+
+        if (desktopCountAll) desktopCountAll.textContent = `(${counts.all})`;
+        if (desktopCountEasy) desktopCountEasy.textContent = `(${counts.easy})`;
+        if (desktopCountMedium) desktopCountMedium.textContent = `(${counts.medium})`;
+        if (desktopCountHard) desktopCountHard.textContent = `(${counts.hard})`;
+        if (desktopCountLocation) desktopCountLocation.textContent = `(${counts['location-specific']})`;
+
+        // Update mobile counts
+        const mobileCountAll = document.getElementById('mobile-count-all');
+        const mobileCountEasy = document.getElementById('mobile-count-easy');
+        const mobileCountMedium = document.getElementById('mobile-count-medium');
+        const mobileCountHard = document.getElementById('mobile-count-hard');
+        const mobileCountLocation = document.getElementById('mobile-count-location');
+
+        if (mobileCountAll) mobileCountAll.textContent = `(${counts.all})`;
+        if (mobileCountEasy) mobileCountEasy.textContent = `(${counts.easy})`;
+        if (mobileCountMedium) mobileCountMedium.textContent = `(${counts.medium})`;
+        if (mobileCountHard) mobileCountHard.textContent = `(${counts.hard})`;
+        if (mobileCountLocation) mobileCountLocation.textContent = `(${counts['location-specific']})`;
     }
 
     function formatCategoryName(category) {
@@ -531,10 +626,24 @@
     }
 
     function clearAllFilters() {
-        if (searchInput) searchInput.value = '';
-        if (categoryFilter) categoryFilter.value = 'all';
-        if (pointsSort) pointsSort.value = 'default';
-        if (completionFilter) completionFilter.value = 'all';
+        // Clear both mobile and desktop
+        const desktopSearch = document.getElementById('desktop-search');
+        const mobileSearch = document.getElementById('mobile-search');
+        const desktopCompletion = document.getElementById('desktop-completion-filter');
+        const mobileCompletion = document.getElementById('mobile-completion-filter');
+        const desktopPoints = document.getElementById('desktop-points-sort');
+        const mobilePoints = document.getElementById('mobile-points-sort');
+
+        if (desktopSearch) desktopSearch.value = '';
+        if (mobileSearch) mobileSearch.value = '';
+        if (desktopCompletion) desktopCompletion.value = 'all';
+        if (mobileCompletion) mobileCompletion.value = 'all';
+        if (desktopPoints) desktopPoints.value = 'default';
+        if (mobilePoints) mobilePoints.value = 'default';
+
+        // Reset category to 'all'
+        currentCategory = 'all';
+        setActiveChip('all');
 
         filterChallenges();
     }
@@ -781,10 +890,13 @@
                             <span class="location-status">Getting location...</span>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="neighborhood-bonus">Neighborhood Bonus Points:</label>
-                        <input type="number" id="neighborhood-bonus" value="${existingData?.neighborhoodBonus || 0}" min="0">
+                        <label for="neighborhood-select">Neighborhoods Visited (max 8):</label>
+                        <select id="neighborhood-select" size="6" style="width: 100%; padding: 4px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px;">
+                        </select>
+                        <div id="selected-neighborhoods" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;"></div>
+                        <small style="display: block; margin-top: 8px; color: #666; font-size: 13px;">Tap a neighborhood to add it. Bonus points calculated on submission based on first-time visits.</small>
                     </div>
 
                     <div class="form-group">
@@ -838,6 +950,151 @@
 
         // Enable submit button regardless of location
         submitBtn.disabled = false;
+
+        // Multi-neighborhood selection with always-visible scrollable list
+        const neighborhoodSelect = modal.querySelector('#neighborhood-select');
+        const selectedNeighborhoodsContainer = modal.querySelector('#selected-neighborhoods');
+        let neighborhoodsData = [];
+        let selectedNeighborhoods = []; // Simple array of neighborhood names
+        const MAX_NEIGHBORHOODS = 8;
+
+        async function loadNeighborhoods() {
+            try {
+                const data = await window.SheetsAPI.readSheetData('Neighborhoods!A2:C');
+                neighborhoodsData = data.map(row => ({
+                    name: row[0] || '',
+                    borough: row[1] || '',
+                    points: parseInt(row[2]) || 0
+                }));
+
+                // Group by borough for better UX
+                const byBorough = neighborhoodsData.reduce((acc, n) => {
+                    if (!acc[n.borough]) acc[n.borough] = [];
+                    acc[n.borough].push(n);
+                    return acc;
+                }, {});
+
+                // Clear and populate select (no placeholder option)
+                neighborhoodSelect.innerHTML = '';
+
+                Object.keys(byBorough).sort().forEach(borough => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = borough.charAt(0).toUpperCase() + borough.slice(1);
+
+                    byBorough[borough].forEach(n => {
+                        const option = document.createElement('option');
+                        option.value = n.name;
+                        option.textContent = n.name;
+                        optgroup.appendChild(option);
+                    });
+
+                    neighborhoodSelect.appendChild(optgroup);
+                });
+
+                // Load existing neighborhoods if editing
+                if (isEditing && existingData?.location) {
+                    const existingLocations = existingData.location.split(',').map(l => l.trim()).filter(l => l);
+                    existingLocations.forEach(loc => {
+                        if (loc && neighborhoodsData.find(n => n.name === loc)) {
+                            addNeighborhood(loc);
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('Error loading neighborhoods:', err);
+                neighborhoodSelect.innerHTML = '<option value="">Error loading neighborhoods</option>';
+            }
+        }
+
+        function addNeighborhood(name) {
+            // Check if already added
+            if (selectedNeighborhoods.includes(name)) {
+                window.toast?.info('Neighborhood already added!');
+                return;
+            }
+
+            // Check max limit
+            if (selectedNeighborhoods.length >= MAX_NEIGHBORHOODS) {
+                window.toast?.warning(`Maximum ${MAX_NEIGHBORHOODS} neighborhoods allowed`);
+                return;
+            }
+
+            selectedNeighborhoods.push(name);
+            renderNeighborhoodChips();
+        }
+
+        function removeNeighborhood(name) {
+            selectedNeighborhoods = selectedNeighborhoods.filter(n => n !== name);
+            renderNeighborhoodChips();
+        }
+
+        function renderNeighborhoodChips() {
+            selectedNeighborhoodsContainer.innerHTML = '';
+
+            selectedNeighborhoods.forEach(name => {
+                const chip = document.createElement('div');
+                chip.style.cssText = `
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 10px 12px;
+                    min-height: 44px;
+                    border-radius: 22px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    background-color: var(--secondary-color);
+                    color: var(--dark-color);
+                    border: 2px solid var(--secondary-dark);
+                `;
+
+                const label = document.createElement('span');
+                label.textContent = name;
+                chip.appendChild(label);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.textContent = '×';
+                removeBtn.style.cssText = `
+                    background: none;
+                    border: none;
+                    color: inherit;
+                    font-size: 24px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    padding: 0;
+                    width: 24px;
+                    height: 24px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0.7;
+                `;
+                removeBtn.addEventListener('click', () => removeNeighborhood(name));
+                chip.appendChild(removeBtn);
+
+                selectedNeighborhoodsContainer.appendChild(chip);
+            });
+        }
+
+        // Handle neighborhood selection
+        neighborhoodSelect.addEventListener('change', function() {
+            const selectedOption = this.selectedOptions[0];
+            if (!selectedOption || !selectedOption.value) return;
+
+            if (selectedNeighborhoods.length >= MAX_NEIGHBORHOODS) {
+                window.toast?.warning(`Maximum ${MAX_NEIGHBORHOODS} neighborhoods allowed`);
+                this.selectedIndex = -1; // Deselect
+                return;
+            }
+
+            addNeighborhood(selectedOption.value);
+
+            // Deselect after adding
+            this.selectedIndex = -1;
+        });
+
+        // Load neighborhoods
+        loadNeighborhoods();
 
         // Handle photo selection
         const photoInput = modal.querySelector('#photo-upload');
@@ -991,7 +1248,8 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const neighborhoodBonus = parseInt(document.getElementById('neighborhood-bonus').value) || 0;
+            // Get comma-separated neighborhood names
+            const neighborhoodNames = selectedNeighborhoods.join(', ');
             const otherBonus = parseInt(document.getElementById('other-bonus').value) || 0;
             const notes = document.getElementById('notes').value;
 
@@ -1024,12 +1282,12 @@
                 const photoLinks = allPhotoLinks.join('\n');
 
                 // Update or add challenge in Google Sheets
+                // Store comma-separated neighborhoods (bonus calculated on-the-fly when displaying)
                 const success = await window.SheetsAPI.updateOrAddChallengeByName(
-                    teamName, 
-                    challenge.title, 
+                    teamName,
+                    challenge.title,
                     {
-                        location: capturedLocation,
-                        neighborhoodBonus,
+                        location: neighborhoodNames, // Comma-separated neighborhood names
                         otherBonus,
                         photoLinks,
                         notes
@@ -1047,8 +1305,7 @@
                         challengeId: challenge.id,
                         challengeName: challenge.title,
                         basePoints: challenge.basePoints,
-                        location: capturedLocation || '',
-                        neighborhoodBonus: neighborhoodBonus,
+                        location: neighborhoodNames || '',
                         otherBonus: otherBonus,
                         photoLinks: photoLinks,
                         notes: notes

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/challenges.css">
+    <link rel="stylesheet" href="../css/challenges-new-filters.css">
 </head>
 <body>
     <main>
@@ -20,84 +21,109 @@
 
         <section class="challenges-section">
             <div class="container">
-                <!-- Sticky Filter Chips Bar -->
-                <div class="filter-chips-sticky">
-                    <button class="chip-search" id="search-toggle" aria-label="Toggle search">
-                        <span class="search-icon">🔍</span>
-                    </button>
+                <!-- Mobile: Floating Search FAB (Fixed Action Button) -->
+                <button class="search-fab" id="mobile-search-fab" aria-label="Search and filter">
+                    <span class="search-fab-icon">🔍</span>
+                </button>
 
-                    <div class="chips-container">
-                        <div class="chips-scroll" id="category-chips">
-                            <button class="filter-chip active" data-category="all">
-                                All <span class="chip-count" id="count-all">(0)</span>
-                            </button>
-                            <button class="filter-chip" data-category="easy">
-                                Easy <span class="chip-count" id="count-easy">(0)</span>
-                            </button>
-                            <button class="filter-chip" data-category="medium">
-                                Medium <span class="chip-count" id="count-medium">(0)</span>
-                            </button>
-                            <button class="filter-chip" data-category="hard">
-                                Hard <span class="chip-count" id="count-hard">(0)</span>
-                            </button>
-                            <button class="filter-chip" data-category="location-specific">
-                                Location <span class="chip-count" id="count-location">(0)</span>
-                            </button>
-                        </div>
+                <!-- Desktop: Filter Bar (always visible) -->
+                <div class="desktop-filters">
+                    <div class="search-box-desktop">
+                        <input type="text" id="desktop-search" placeholder="Search challenges..." aria-label="Search challenges">
                     </div>
 
-                    <button class="chip-more" id="more-filters" aria-label="More filters">
-                        <span class="more-icon">⚙️</span>
-                    </button>
-                </div>
-
-                <!-- Search Bottom Sheet Overlay -->
-                <div class="bottom-sheet-overlay" id="search-overlay"></div>
-
-                <!-- Search Bottom Sheet -->
-                <div class="bottom-sheet" id="search-sheet">
-                    <div class="bottom-sheet-header">
-                        <h3>Search Challenges</h3>
-                        <button class="bottom-sheet-close" id="search-sheet-close" aria-label="Close search">×</button>
+                    <div class="filter-chips-desktop">
+                        <button class="filter-chip active" data-category="all">
+                            All <span class="chip-count" id="desktop-count-all">(0)</span>
+                        </button>
+                        <button class="filter-chip" data-category="easy">
+                            Easy <span class="chip-count" id="desktop-count-easy">(0)</span>
+                        </button>
+                        <button class="filter-chip" data-category="medium">
+                            Medium <span class="chip-count" id="desktop-count-medium">(0)</span>
+                        </button>
+                        <button class="filter-chip" data-category="hard">
+                            Hard <span class="chip-count" id="desktop-count-hard">(0)</span>
+                        </button>
+                        <button class="filter-chip" data-category="location-specific">
+                            Location <span class="chip-count" id="desktop-count-location">(0)</span>
+                        </button>
                     </div>
-                    <div class="bottom-sheet-content">
-                        <div class="search-box-expandable">
-                            <input type="text" id="challenge-search" placeholder="Search challenges..." aria-label="Search challenges">
-                        </div>
+
+                    <div class="desktop-filters-dropdowns">
+                        <select id="desktop-completion-filter" aria-label="Filter by completion status">
+                            <option value="all">All Status</option>
+                            <option value="not-completed">Not Completed</option>
+                            <option value="completed">Completed</option>
+                        </select>
+
+                        <select id="desktop-points-sort" aria-label="Sort by points">
+                            <option value="default">Default Order</option>
+                            <option value="points-asc">Points: Low → High</option>
+                            <option value="points-desc">Points: High → Low</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Filters Bottom Sheet Overlay -->
-                <div class="bottom-sheet-overlay" id="filters-overlay"></div>
-
-                <!-- More Filters Bottom Sheet -->
-                <div class="bottom-sheet" id="filters-sheet">
+                <!-- Mobile: Bottom Sheet with All Filters -->
+                <div class="bottom-sheet-overlay" id="mobile-filters-overlay"></div>
+                <div class="bottom-sheet" id="mobile-filters-sheet">
                     <div class="bottom-sheet-header">
-                        <h3>Filters & Sorting</h3>
-                        <button class="bottom-sheet-close" id="filters-sheet-close" aria-label="Close filters">×</button>
+                        <h3>Search & Filters</h3>
+                        <button class="bottom-sheet-close" id="mobile-filters-close" aria-label="Close">×</button>
                     </div>
                     <div class="bottom-sheet-content">
-                        <div class="filter-group">
-                            <label for="points-sort">Sort by Points:</label>
-                            <select id="points-sort" aria-label="Sort by points">
-                                <option value="default">Default Order</option>
-                                <option value="points-asc">Points: Low to High</option>
-                                <option value="points-desc">Points: High to Low</option>
-                            </select>
+                        <!-- Search -->
+                        <div class="filter-section">
+                            <label>Search</label>
+                            <input type="text" id="mobile-search" placeholder="Search challenges..." aria-label="Search challenges">
                         </div>
 
-                        <div class="filter-group">
-                            <label for="completion-filter">Status:</label>
-                            <select id="completion-filter" aria-label="Filter by completion status">
+                        <!-- Difficulty -->
+                        <div class="filter-section">
+                            <label>Difficulty</label>
+                            <div class="filter-chips-mobile">
+                                <button class="filter-chip active" data-category="all">
+                                    All <span class="chip-count" id="mobile-count-all">(0)</span>
+                                </button>
+                                <button class="filter-chip" data-category="easy">
+                                    Easy <span class="chip-count" id="mobile-count-easy">(0)</span>
+                                </button>
+                                <button class="filter-chip" data-category="medium">
+                                    Medium <span class="chip-count" id="mobile-count-medium">(0)</span>
+                                </button>
+                                <button class="filter-chip" data-category="hard">
+                                    Hard <span class="chip-count" id="mobile-count-hard">(0)</span>
+                                </button>
+                                <button class="filter-chip" data-category="location-specific">
+                                    Location <span class="chip-count" id="mobile-count-location">(0)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="filter-section">
+                            <label for="mobile-completion-filter">Status</label>
+                            <select id="mobile-completion-filter" aria-label="Filter by completion status">
                                 <option value="all">All Challenges</option>
                                 <option value="not-completed">Not Completed</option>
                                 <option value="completed">Completed Only</option>
                             </select>
                         </div>
 
+                        <!-- Sort -->
+                        <div class="filter-section">
+                            <label for="mobile-points-sort">Sort by Points</label>
+                            <select id="mobile-points-sort" aria-label="Sort by points">
+                                <option value="default">Default Order</option>
+                                <option value="points-asc">Points: Low to High</option>
+                                <option value="points-desc">Points: High to Low</option>
+                            </select>
+                        </div>
+
                         <div class="filter-panel-actions">
-                            <button id="clear-filters" class="btn btn-secondary">Clear All</button>
-                            <button id="apply-filters" class="btn btn-primary">Apply</button>
+                            <button id="mobile-clear-filters" class="btn btn-secondary">Clear All</button>
+                            <button id="mobile-apply-filters" class="btn btn-primary">Apply</button>
                         </div>
                     </div>
                 </div>
