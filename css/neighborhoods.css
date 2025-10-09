@@ -1,5 +1,24 @@
 /* Neighborhoods page specific styles */
 
+/* Sign in prompt */
+.sign-in-prompt {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--primary-color);
+}
+
+.sign-in-prompt h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.sign-in-prompt p {
+    color: var(--dark-color);
+    margin-bottom: var(--spacing-sm);
+}
+
 /* Page header */
 .page-header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); /* Blue to Orange gradient */

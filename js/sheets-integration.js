@@ -36,6 +36,9 @@ async function initializeGapiClient() {
         });
         gapiInited = true;
         console.log('Google API client initialized (Sheets + Drive)');
+
+        // Notify that GAPI is ready
+        window.dispatchEvent(new CustomEvent('gapiInitComplete'));
     } catch (err) {
         console.error('Error initializing GAPI client:', err);
     }
