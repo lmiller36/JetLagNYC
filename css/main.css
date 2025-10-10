@@ -1047,3 +1047,36 @@ User Info Styles */
         display: none;
     }
 }
+
+/* Rules Note Box (inside scoring cards) */
+.rules-note {
+    background: linear-gradient(135deg, rgba(238, 137, 114, 0.15), rgba(209, 90, 124, 0.15));
+    border: 2px solid var(--danger-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+.rules-note strong {
+    color: var(--danger-color);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.rules-note ul {
+    margin: var(--spacing-xs) 0 0 var(--spacing-md);
+    padding: 0;
+}
+
+.rules-note li {
+    margin: var(--spacing-xs) 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .rules-note {
+        padding: var(--spacing-sm);
+        font-size: 0.8125rem;
+    }
+}

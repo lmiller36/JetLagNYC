@@ -928,7 +928,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="neighborhood-select">Neighborhoods Visited (max 8):</label>
+                        <label for="neighborhood-select">Neighborhoods Visited (max 12):</label>
                         <select id="neighborhood-select" size="6" style="width: 100%; padding: 4px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px;">
                         </select>
                         <div id="selected-neighborhoods" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;"></div>
@@ -987,7 +987,7 @@
         const selectedNeighborhoodsContainer = modal.querySelector('#selected-neighborhoods');
         let neighborhoodsData = [];
         let selectedNeighborhoods = []; // Simple array of neighborhood names
-        const MAX_NEIGHBORHOODS = 8;
+        const MAX_NEIGHBORHOODS = 12;
 
         async function loadNeighborhoods() {
             try {
@@ -1277,6 +1277,15 @@
         }
 
         photoInput.addEventListener('change', (e) => {
+            const MAX_PHOTOS = 12;
+            const totalPhotos = selectedPhotos.length + existingPhotoLinks.length + e.target.files.length;
+
+            if (totalPhotos > MAX_PHOTOS) {
+                alert(`Maximum ${MAX_PHOTOS} photos/videos allowed. You currently have ${selectedPhotos.length + existingPhotoLinks.length}.`);
+                e.target.value = ''; // Clear the input
+                return;
+            }
+
             // Add to existing photos, don't replace
             selectedPhotos.push(...Array.from(e.target.files));
             renderPhotoPreview();

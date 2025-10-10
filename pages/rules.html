@@ -11,8 +11,8 @@
     <style>
         /* Rules page specific styles */
         .rules-hero {
-            background: linear-gradient(135deg, var(--warning-color), #e0a800);
-            color: var(--dark-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
             padding: var(--spacing-2xl) 0;
             text-align: center;
         }
@@ -28,6 +28,7 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
+            opacity: 0.95;
         }
 
         .rules-content {
@@ -39,7 +40,7 @@
         }
 
         .rules-card {
-            background-color: var(--white);
+            background-color: var(--card-bg);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             padding: var(--spacing-xl);
@@ -55,7 +56,7 @@
         }
 
         .rules-card h4 {
-            color: var(--secondary-color);
+            color: var(--dark-color);
             font-size: var(--font-size-lg);
             margin: var(--spacing-lg) 0 var(--spacing-md) 0;
         }
@@ -67,7 +68,7 @@
 
         .rules-list li {
             padding: var(--spacing-sm) 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--accent-warm);
             position: relative;
             padding-left: var(--spacing-xl);
         }
@@ -91,11 +92,12 @@
         }
 
         .scoring-card {
-            background: linear-gradient(135deg, var(--light-color), #e9ecef);
+            background: var(--card-bg);
             border: 2px solid var(--primary-color);
             border-radius: var(--border-radius);
             padding: var(--spacing-lg);
             text-align: center;
+            box-shadow: var(--box-shadow);
         }
 
         .scoring-card h4 {
@@ -103,31 +105,28 @@
             margin-bottom: var(--spacing-md);
         }
 
+        .scoring-card p {
+            color: var(--dark-color);
+        }
+
         .points-display {
             font-size: var(--font-size-2xl);
             font-weight: bold;
-            color: var(--success-color);
+            color: var(--primary-color);
             margin: var(--spacing-sm) 0;
         }
 
         .example-box {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, var(--light-color), var(--accent-warm));
             border-left: 4px solid var(--primary-color);
             padding: var(--spacing-lg);
             margin: var(--spacing-lg) 0;
+            border-radius: var(--border-radius);
         }
 
         .example-box h5 {
             color: var(--primary-color);
             margin-bottom: var(--spacing-md);
-        }
-
-        .highlight {
-            background-color: #fff3cd;
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--border-radius);
-            border: 1px solid #ffeaa7;
-            margin: var(--spacing-md) 0;
         }
 
         .challenge-categories {
@@ -138,7 +137,7 @@
         }
 
         .category-card {
-            background-color: var(--white);
+            background-color: var(--card-bg);
             border: 2px solid;
             border-radius: var(--border-radius);
             padding: var(--spacing-md);
@@ -147,33 +146,36 @@
 
         .category-general {
             border-color: var(--success-color);
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            background: linear-gradient(135deg, rgba(126, 191, 142, 0.2), rgba(126, 191, 142, 0.1));
         }
 
         .category-medium {
-            border-color: var(--warning-color);
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, var(--accent-warm), rgba(247, 214, 149, 0.3));
         }
 
         .category-hard {
             border-color: var(--danger-color);
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            background: linear-gradient(135deg, rgba(209, 90, 124, 0.2), rgba(209, 90, 124, 0.1));
         }
 
         .category-location {
             border-color: var(--primary-color);
-            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            background: linear-gradient(135deg, rgba(238, 137, 114, 0.2), rgba(238, 137, 114, 0.1));
         }
 
         .toc {
-            background-color: var(--light-color);
+            background: var(--card-bg);
             border-radius: var(--border-radius);
             padding: var(--spacing-lg);
             margin-bottom: var(--spacing-xl);
+            border: 2px solid var(--primary-color);
+            box-shadow: var(--box-shadow);
         }
 
         .toc h3 {
             margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
         }
 
         .toc ul {
@@ -186,11 +188,13 @@
         }
 
         .toc a {
-            color: var(--primary-color);
+            color: var(--dark-color);
             text-decoration: none;
+            transition: var(--transition);
         }
 
         .toc a:hover {
+            color: var(--primary-color);
             text-decoration: underline;
         }
 
@@ -199,11 +203,14 @@
             .scoring-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+
             .challenge-categories {
                 grid-template-columns: repeat(2, 1fr);
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
             }
-            
+
             .rules-hero h2 {
                 font-size: var(--font-size-4xl);
             }
@@ -211,7 +218,7 @@
 
         @media (min-width: 1024px) {
             .challenge-categories {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -245,11 +252,11 @@
                 <div class="rules-section" id="game-overview">
                     <div class="rules-card">
                         <h3>🎯 Game Overview</h3>
-                        <p>The NYC Scavenger Hunt is a competitive game inspired by "Jet Lag the Game" where teams race across New York City's five boroughs to complete challenges and earn points. Teams must strategically choose which neighborhoods to visit and which challenges to complete to maximize their score.</p>
+                        <p>The NYC Scavenger Hunt is a competitive game inspired by "Jet Lag the Game" where teams race across New York City to complete challenges and earn points. Teams must strategically choose which neighborhoods to visit and which challenges to complete to maximize their score.</p>
                         
                         <h4>Basic Concept</h4>
                         <ul class="rules-list">
-                            <li>Teams compete across Manhattan, Queens, Brooklyn, Bronx, and Staten Island</li>
+                            <li>Teams compete across Manhattan, Queens, and Brooklyn</li>
                             <li>Complete challenges in different neighborhoods to earn points</li>
                             <li>Submit photo evidence of challenge completion</li>
                             <li>Strategic planning is key - some areas offer more points but are harder to reach</li>
@@ -267,10 +274,16 @@
                         <div class="scoring-grid">
                             <div class="scoring-card">
                                 <h4>Neighborhood Points</h4>
-                                <div class="points-display">Base × 4</div>
-                                <p>Each neighborhood has a base point value that gets multiplied by 4. Areas farther from Midtown Manhattan offer higher base points.</p>
+                                <p>Each neighborhood has a base point value. Areas farther from Midtown Manhattan offer higher base points.</p>
+                                <div class="rules-note">
+                                    <strong>⚠️ Important Rules:</strong>
+                                    <ul>
+                                        <li>Neighborhood points only count the <strong>FIRST time</strong> you complete a challenge there</li>
+                                        <li>You <strong>MUST complete a challenge</strong> in that location to earn the bonus</li>
+                                    </ul>
+                                </div>
                             </div>
-                            
+
                             <div class="scoring-card">
                                 <h4>Challenge Points</h4>
                                 <div class="points-display">Varies</div>
@@ -280,12 +293,12 @@
 
                         <div class="example-box">
                             <h5>📊 Scoring Example</h5>
-                            <p><strong>Scenario:</strong> Complete a "Take a selfie with street art" challenge (15 points) in Williamsburg, Brooklyn (base: 8 points)</p>
+                            <p><strong>Scenario:</strong> Complete a "Take a selfie with street art" challenge (5 points) in Williamsburg, Brooklyn (base: 8 points)</p>
                             <p><strong>Calculation:</strong></p>
                             <ul>
-                                <li>Neighborhood points: 8 × 4 = 32 points</li>
-                                <li>Challenge points: 15 points</li>
-                                <li><strong>Total: 47 points</strong></li>
+                                <li>Neighborhood points: 8 points</li>
+                                <li>Challenge points: 5 points</li>
+                                <li><strong>Total: 13 points</strong></li>
                             </ul>
                         </div>
 
@@ -299,24 +312,14 @@
                 <div class="rules-section" id="challenge-types">
                     <div class="rules-card">
                         <h3>🎮 Challenge Categories</h3>
-                        <p>Challenges are organized into four categories, each with different difficulty levels and requirements.</p>
+                        <p>Challenges are organized into two categories.</p>
                         
                         <div class="challenge-categories">
                             <div class="category-card category-general">
                                 <h4>General</h4>
                                 <p>Can be completed anywhere in NYC. Usually easier and worth fewer points.</p>
                             </div>
-                            
-                            <div class="category-card category-medium">
-                                <h4>Medium</h4>
-                                <p>Moderate difficulty challenges that may require specific types of locations.</p>
-                            </div>
-                            
-                            <div class="category-card category-hard">
-                                <h4>Hard</h4>
-                                <p>Difficult challenges requiring more effort, creativity, or specific skills.</p>
-                            </div>
-                            
+                        
                             <div class="category-card category-location">
                                 <h4>Location-Specific</h4>
                                 <p>Must be completed in specific neighborhoods or at particular landmarks.</p>
@@ -380,9 +383,6 @@
                             <p><strong>Total if bonus completed:</strong> 15 points + neighborhood points</p>
                         </div>
 
-                        <div class="highlight">
-                            <strong>💰 Bonus Strategy:</strong> Bonus points can significantly increase your score, but they often require extra time or money. Plan accordingly!
-                        </div>
                     </div>
                 </div>
 
@@ -393,7 +393,7 @@
                         
                         <h4>Team Rules</h4>
                         <ul class="rules-list">
-                            <li>Teams can have 2-4 members (check with organizers for specific limits)</li>
+                            <li>Teams will be formed the day of the event</li>
                             <li>All team members must stay together during challenges</li>
                             <li>Teams cannot split up to complete multiple challenges simultaneously</li>
                             <li>Each team gets one submission per challenge</li>
@@ -401,9 +401,8 @@
 
                         <h4>Transportation & Movement</h4>
                         <ul class="rules-list">
-                            <li>Use any legal form of transportation (subway, bus, taxi, walking, etc.)</li>
+                            <li>Use any form of transportation (subway, bus, taxi, walking, etc.)</li>
                             <li>Follow all traffic laws and safety regulations</li>
-                            <li>Respect private property and "No Trespassing" signs</li>
                             <li>Be courteous to NYC residents and businesses</li>
                         </ul>
 
@@ -413,7 +412,6 @@
                             <li>Challenges must be completed in the order you choose</li>
                             <li>No advance preparation or pre-staging allowed</li>
                             <li>All activities must be legal and safe</li>
-                            <li>Respect business hours and private events</li>
                         </ul>
 
                         <h4>Submission Rules</h4>
@@ -449,7 +447,7 @@
                             <li>Have backup challenges ready in case your first choice isn't possible</li>
                         </ul>
 
-                        <div class="highlight">
+                        <div class="example-box">
                             <strong>🏆 Remember:</strong> The goal is to have fun exploring NYC while being competitive. Play fair, be safe, and enjoy the adventure!
                         </div>
                     </div>
