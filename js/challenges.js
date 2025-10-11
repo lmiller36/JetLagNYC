@@ -394,11 +394,13 @@
 
         // Apply search filter
         if (searchTerm) {
-            filteredChallenges = filteredChallenges.filter(challenge =>
-                challenge.title.toLowerCase().includes(searchTerm) ||
-                challenge.description.toLowerCase().includes(searchTerm) ||
-                (challenge.locationRestriction &&
-                    challenge.locationRestriction.value.toLowerCase().includes(searchTerm))
+            filteredChallenges = filteredChallenges.filter(challenge => {
+                return challenge.title.toLowerCase().includes(searchTerm) ||
+                    challenge.description.toLowerCase().includes(searchTerm) ||
+                    (challenge.locationRestriction && challenge.locationRestriction.value &&
+                        challenge.locationRestriction.value.toLowerCase().includes(searchTerm)
+                    )
+            }
             );
         }
 
