@@ -60,9 +60,9 @@ These challenges can be completed anywhere in NYC (unless otherwise specified).
 | Beachfront Property | Build a sandcastle at a NYC beach | Hard | 12 | Most elaborate sandcastle |
 | Met a Yankee, Netted a Ranger, Knicked a Giant | Get selfies with 4 different people wearing 4 different NY major sports teams gear | Hard | 12 | None |
 | Sidewalk CEO | Make money by peddling/selling something. | Hard | 13 | Most money earned |
-| The City's Finest Art Curator | Go to a museum/gallery and give a fake explanation about a piece to bystanders | Hard | 15 | Funniest explanation |
+| The City's Finest Art Curator | Go to a museum/gallery and give a fake explanation about a piece to bystanders | Hard | 25 | Funniest explanation |
 | 5k a month for this East Village shoebox??? | Tour an apartment that will be up for rent soon | Hard | 15 | None |
-| Flights of Fancy | Go to an airport and pretend you're an airplane for 3 minutes | Hard | 20 | None |
+| Flights of Fancy | Pretend you're an airplane for 3 minutes with a NYC airport in sight | Hard | 20 | None |
 | Island Hopping | Visit and stand on 5 different islands in NYC | Hard | 20 | None |
 
 ### Location-Specific Challenges
