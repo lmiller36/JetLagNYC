@@ -40,9 +40,18 @@
                             <p>Loading neighborhoods...</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
 
-                    <div class="points-values-image">
-                        <img src="../NYC Scavenger Hunt Points Values.png" alt="NYC Scavenger Hunt Points Values" />
+        <!-- Interactive Map Section -->
+        <section class="map-section">
+            <div class="container">
+                <h3>Interactive Neighborhood Map</h3>
+                <p>Explore NYC neighborhoods on the map below. Each colored area represents a different neighborhood with varying point values.</p>
+                <div id="map-container" class="map-container">
+                    <div class="map-placeholder">
+                        <p>Loading interactive map...</p>
                     </div>
                 </div>
             </div>
@@ -75,6 +84,12 @@
         </div>
     </footer>
 
+    <!-- Apple MapKit JS -->
+    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+    
+    <!-- Neighborhood data -->
+    <script src="../js/data/neighborhood_data.js"></script>
+    
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <script src="../js/shared-nav.js"></script>
