@@ -87,6 +87,7 @@ function generateMarkdown() {
         title: row.title || '',
         description: row.description || '',
         bonusDescription: row.bonusDescription || '',
+        bonusPoints: row.bonusPoints || '',
         category: (row.category || 'easy').toLowerCase(),
         points: parseInt(row.points) || 0,
         locationRestriction: row.locationRestriction || ''
@@ -142,7 +143,15 @@ These challenges can be completed anywhere in NYC (unless otherwise specified).
     // Add non-location challenges
     nonLocationChallenges.forEach(c => {
         const difficulty = c.category.charAt(0).toUpperCase() + c.category.slice(1);
-        const bonus = c.bonusDescription || 'None';
+        let bonus = 'None';
+        if (c.bonusDescription) {
+            const descriptions = c.bonusDescription.split(',').map(b => b.trim());
+            const points = c.bonusPoints ? c.bonusPoints.split(',').map(p => p.trim()) : [];
+            bonus = descriptions.map((desc, i) => {
+                const pts = points[i] ? ` (+${points[i]} pts)` : '';
+                return `${desc}${pts}`;
+            }).join(', ');
+        }
         markdown += `| ${c.title} | ${c.description} | ${difficulty} | ${c.points} | ${bonus} |\n`;
     });
 
@@ -157,7 +166,15 @@ These challenges must be completed in specific neighborhoods.
     locationChallenges.forEach(c => {
         const difficulty = c.category.charAt(0).toUpperCase() + c.category.slice(1);
         const location = c.locationRestriction || 'Any';
-        const bonus = c.bonusDescription || 'None';
+        let bonus = 'None';
+        if (c.bonusDescription) {
+            const descriptions = c.bonusDescription.split(',').map(b => b.trim());
+            const points = c.bonusPoints ? c.bonusPoints.split(',').map(p => p.trim()) : [];
+            bonus = descriptions.map((desc, i) => {
+                const pts = points[i] ? ` (+${points[i]} pts)` : '';
+                return `${desc}${pts}`;
+            }).join(', ');
+        }
         markdown += `| ${c.title} | ${c.description} | ${difficulty} | ${c.points} | ${location} | ${bonus} |\n`;
     });
 

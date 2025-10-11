@@ -315,8 +315,8 @@
         try {
             console.log('Loading challenges from Google Sheets...');
 
-            // Read from Challenges sheet (columns: ID, Title, Description, Bonus Description, Category, Base Points, Location Restriction)
-            const sheetData = await readSheetData('Challenges!A2:G');
+            // Read from Challenges sheet (columns: ID, Title, Description, Bonus Description, Bonus Points, Category, Base Points, Location Restriction)
+            const sheetData = await readSheetData('Challenges!A2:H');
 
             if (!sheetData || sheetData.length === 0) {
                 throw new Error('No data in Challenges sheet');
@@ -328,15 +328,17 @@
                 const title = row[1] || '';
                 const description = row[2] || '';
                 const bonusDescription = row[3] || '';
-                const category = (row[4] || 'easy').toLowerCase();
-                const basePoints = parseInt(row[5]) || 0;
-                const locationRestriction = row[6] || '';
+                const bonusPoints = row[4] || '';
+                const category = (row[5] || 'easy').toLowerCase();
+                const basePoints = parseInt(row[6]) || 0;
+                const locationRestriction = row[7] || '';
 
                 return {
                     id: id,
                     title: title,
                     description: description,
                     bonusDescription: bonusDescription,
+                    bonusPoints: bonusPoints,
                     category: category,
                     points: basePoints,
                     basePoints: basePoints, // Used in display
@@ -469,15 +471,19 @@
         const categoryIcon = categoryIcons[challenge.category] || '📋';
 
         let bonusPointsHTML = '';
-        if (challenge.bonusPoints && challenge.bonusPoints.trim()) {
-            // bonusPoints is a comma-separated string from the sheet
-            const bonusList = challenge.bonusPoints.split(',').map(b => b.trim()).filter(b => b);
-            if (bonusList.length > 0) {
+        if (challenge.bonusDescription && challenge.bonusDescription.trim()) {
+            const bonusDescriptions = challenge.bonusDescription.split(',').map(b => b.trim()).filter(b => b);
+            const bonusPointsList = challenge.bonusPoints ? challenge.bonusPoints.split(',').map(p => p.trim()).filter(p => p) : [];
+
+            if (bonusDescriptions.length > 0) {
                 bonusPointsHTML = `
                     <div class="bonus-points">
-                        <h4>Bonuses:</h4>
+                        <h4>⭐ Bonuses:</h4>
                         <ul>
-                            ${bonusList.map(bonus => `<li>${escapeHTML(bonus)}</li>`).join('')}
+                            ${bonusDescriptions.map((bonus, i) => {
+                                const points = bonusPointsList[i] ? `+${bonusPointsList[i]} pts` : '';
+                                return `<li>${escapeHTML(bonus)}${points ? ` <strong style="color: white;">(${points})</strong>` : ''}</li>`;
+                            }).join('')}
                         </ul>
                     </div>
                 `;
@@ -1431,7 +1437,7 @@
         }
 
         // CSV header
-        const headers = ['id', 'title', 'description', 'bonusDescription', 'category', 'points', 'locationRestriction'];
+        const headers = ['id', 'title', 'description', 'bonusDescription', 'bonusPoints', 'category', 'points', 'locationRestriction'];
         const csvRows = [headers.join(',')];
 
         // Add data rows
@@ -1441,6 +1447,7 @@
                 escapeCSV(challenge.title),
                 escapeCSV(challenge.description),
                 escapeCSV(challenge.bonusDescription),
+                escapeCSV(challenge.bonusPoints),
                 escapeCSV(challenge.category),
                 challenge.points || 0,
                 escapeCSV(challenge.locationRestriction)
