@@ -33,6 +33,7 @@ function loadSharedNavigation() {
                         <li><a href="${pathPrefix}index.html" class="nav-link" data-page="home">Home</a></li>
                         <li><a href="${pathPrefix}pages/challenges.html" class="nav-link" data-page="challenges">Challenges</a></li>
                         <li><a href="${pathPrefix}pages/neighborhoods.html" class="nav-link" data-page="neighborhoods">Neighborhoods</a></li>
+                        <li><a href="${pathPrefix}pages/leaderboard.html" class="nav-link" data-page="leaderboard">Leaderboard</a></li>
                         <li><a href="${pathPrefix}pages/team.html" class="nav-link" data-page="team">Team</a></li>
                         <li><a href="${pathPrefix}pages/rules.html" class="nav-link" data-page="rules">Rules</a></li>
                     </ul>
@@ -185,6 +186,7 @@ function setActivePage() {
         'index.html': 'home',
         'challenges.html': 'challenges',
         'neighborhoods.html': 'neighborhoods',
+        'leaderboard.html': 'leaderboard',
         'team.html': 'team',
         'submission.html': 'submission',
         'rules.html': 'rules'

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NYC Scavenger Hunt Leaderboard - View team rankings and scores">
+    <title>Leaderboard - NYC Scavenger Hunt</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/leaderboard.css">
+</head>
+<body>
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h2>Leaderboard</h2>
+                <p>See how all teams are performing in the NYC Scavenger Hunt!</p>
+            </div>
+        </section>
+
+        <!-- Main leaderboard section -->
+        <section class="leaderboard-section">
+            <div class="container">
+                <!-- Loading state -->
+                <div id="loadingState" class="loading-container">
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <div class="loading-spinner"></div>
+                        <p style="color: #666; font-size: 18px; margin-top: 20px;">Loading team scores...</p>
+                    </div>
+                </div>
+
+                <!-- Auth prompt (shown when not authenticated) -->
+                <div id="authPrompt" class="auth-prompt" style="display: none;">
+                    <div class="auth-card">
+                        <h3>Sign in to view the leaderboard</h3>
+                        <p>You need to be signed in with Google to view team scores and progress.</p>
+                        <button onclick="window.Auth.signIn()" class="btn btn-primary">Sign In with Google</button>
+                    </div>
+                </div>
+
+                <!-- Leaderboard content -->
+                <div id="leaderboardContent" style="display: none;">
+                    <!-- Last updated info -->
+                    <div class="update-info">
+                        <button onclick="refreshLeaderboard()" class="btn btn-secondary btn-refresh">
+                            🔄 Refresh
+                        </button>
+                        <span class="last-updated" id="lastUpdated"></span>
+                    </div>
+
+                    <!-- Team scores table -->
+                    <div class="leaderboard-table-container">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Team</th>
+                                    <th>Total Score</th>
+                                    <th>Challenges</th>
+                                    <th>Base Points</th>
+                                    <th>Neighborhood Bonus</th>
+                                    <th>Other Bonus</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardTableBody">
+                                <!-- Team rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- No teams message -->
+                    <div class="no-teams" id="noTeams" style="display: none;">
+                        <p>No teams found. Teams will appear here once they start completing challenges.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Detail Modal -->
+        <div class="modal-overlay" id="teamModalOverlay" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="teamModalTitle">Team Details</h3>
+                    <button class="modal-close" onclick="closeTeamModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="team-summary" id="teamSummary">
+                        <!-- Team summary will be populated here -->
+                    </div>
+                    
+                    <h4>Completed Challenges</h4>
+                    <div class="challenges-list" id="teamChallengesList">
+                        <!-- Challenge list will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025....Not actually...but wouldn't that be cool?</p>
+        </div>
+    </footer>
+
+    <!-- Required scripts for Google API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- App scripts -->
+    <script src="../js/shared-nav.js"></script>
+    <script src="../js/sheets-integration.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/leaderboard.js"></script>
+    <script src="../js/nav.js"></script>
+</body>
+</html>

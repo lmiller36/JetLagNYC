@@ -443,6 +443,82 @@ async function initializeTeamSheet(teamName, challengeList = []) {
     }
 }
 
+/**
+ * Get all team sheets and their scores
+ * @returns {Promise<Array>} Array of team score objects
+ */
+async function getAllTeamScores() {
+    try {
+        // Get all sheets in the spreadsheet
+        const response = await gapi.client.sheets.spreadsheets.get({
+            spreadsheetId: SHEET_ID
+        });
+        
+        const sheets = response.result.sheets || [];
+        const teamScores = [];
+        
+        // Filter out system sheets (Neighborhoods, etc.) and calculate scores for team sheets
+        for (const sheet of sheets) {
+            const sheetName = sheet.properties.title;
+            
+            // Skip system sheets
+            if (sheetName === 'Neighborhoods' || sheetName === 'Master' || sheetName.startsWith('_')) {
+                continue;
+            }
+            
+            try {
+                const score = await calculateTeamScore(sheetName);
+                teamScores.push(score);
+            } catch (err) {
+                console.warn(`Could not calculate score for team ${sheetName}:`, err);
+                // Add team with zero score if calculation fails
+                teamScores.push({
+                    teamName: sheetName,
+                    completedChallenges: 0,
+                    totalBasePoints: 0,
+                    totalNeighborhoodBonus: 0,
+                    totalOtherBonus: 0,
+                    totalScore: 0,
+                    totalChallenges: 0
+                });
+            }
+        }
+        
+        // Sort by total score descending
+        teamScores.sort((a, b) => b.totalScore - a.totalScore);
+        
+        return teamScores;
+    } catch (err) {
+        console.error('Error getting all team scores:', err);
+        throw err;
+    }
+}
+
+/**
+ * Get detailed team data including all completed challenges
+ * @param {string} teamName - Name of the team
+ * @returns {Promise<Object>} Team details with challenges and score
+ */
+async function getTeamDetails(teamName) {
+    try {
+        const [challenges, score] = await Promise.all([
+            getTeamChallenges(teamName),
+            calculateTeamScore(teamName)
+        ]);
+        
+        // Filter only completed challenges (those with challengeId)
+        const completedChallenges = challenges.filter(challenge => challenge.challengeId);
+        
+        return {
+            ...score,
+            challenges: completedChallenges
+        };
+    } catch (err) {
+        console.error(`Error getting team details for ${teamName}:`, err);
+        throw err;
+    }
+}
+
 
 // Export functions for use in other scripts (export immediately, not in load event)
 window.SheetsAPI = {
@@ -460,7 +536,9 @@ window.SheetsAPI = {
     addChallengeToTeam,
     addPhotoToChallenge,
     calculateTeamScore,
-    initializeTeamSheet
+    initializeTeamSheet,
+    getAllTeamScores,
+    getTeamDetails
 };
 
 // Initialize when the page loads
