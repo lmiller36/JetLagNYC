@@ -578,7 +578,8 @@
      * Show neighborhood popup card when clicked
      */
     function showNeighborhoodPopup(neighborhood, polygon) {
-        // Note: cleanup is handled in createCardModal()
+        // Remove any existing popup
+        removeNeighborhoodPopup(true);
         
         // Get the color for this point value
         const pointColors = window.NEIGHBORHOOD_DATA.pointColors;
@@ -588,7 +589,6 @@
         let centerLat = 40.7589; // Default to NYC center
         let centerLng = -73.9851;
         
-        
         if (polygon.points[0] && polygon.points[0].length >= 3) {
             const centroid = calculatePolygonCentroid(polygon.points[0]);
             if (centroid) {
@@ -597,323 +597,104 @@
             }
         }
         
-        // Create the popup content
-        const popupContent = `
-            <div class="neighborhood-popup-card" style="
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                padding: 16px;
-                max-width: 280px;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            ">
-                <div style="
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 12px;
-                ">
-                    <div style="
-                        width: 20px;
-                        height: 20px;
-                        background-color: ${color};
-                        border-radius: 50%;
-                        margin-right: 8px;
-                        border: 2px solid white;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-                    "></div>
-                    <h3 style="
-                        margin: 0;
-                        font-size: 18px;
-                        font-weight: 600;
-                        color: #333;
-                    ">${neighborhood.displayName}</h3>
-                </div>
-                
-                <div style="margin-bottom: 8px;">
-                    <span style="
-                        display: inline-block;
-                        background-color: ${color};
-                        color: white;
-                        padding: 4px 8px;
-                        border-radius: 12px;
-                        font-size: 12px;
-                        font-weight: 600;
-                        margin-right: 8px;
-                    ">${neighborhood.pointValue} Points</span>
-                    <span style="
-                        color: #666;
-                        font-size: 14px;
-                    ">${neighborhood.borough}</span>
-                </div>
-                
-                <p style="
-                    margin: 0;
-                    font-size: 14px;
-                    line-height: 1.4;
-                    color: #555;
-                ">${neighborhood.description}</p>
-                
-                <button onclick="removeNeighborhoodPopup()" style="
-                    position: absolute;
-                    top: 8px;
-                    right: 8px;
-                    background: none;
-                    border: none;
-                    font-size: 18px;
-                    color: #999;
-                    cursor: pointer;
-                    width: 24px;
-                    height: 24px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 50%;
-                " onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">×</button>
-            </div>
-        `;
-        
-        // Validate coordinates before creating annotation
+        // Validate coordinates
         if (typeof centerLat !== 'number' || typeof centerLng !== 'number' || 
             isNaN(centerLat) || isNaN(centerLng)) {
             centerLat = 40.7589; // NYC center fallback
             centerLng = -73.9851;
         }
         
-        // Create a card modal on the right side of the map
-        createCardModal(neighborhood, color);
-        
-    }
-    
-    /**
-     * Create a card modal popup on the right side of the map
-     */
-    function createCardModal(neighborhood, color) {
-        // Completely clean slate - remove everything modal-related
-        cleanupAllModals();
-        
-        // Check if mobile
+        // Check if mobile for compact display
         const isMobile = window.innerWidth <= 768;
         
-        // Get map container bounds to position relative to map
-        const mapRect = mapContainer.getBoundingClientRect();
-        
-        // Create modal element
-        const modal = document.createElement('div');
-        modal.id = 'neighborhood-modal';
-        if (isMobile) {
-            // Mobile: Bottom sheet style
-            modal.style.cssText = `
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                max-height: 50vh;
-                background: white;
-                border-radius: 16px 16px 0 0;
-                box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-                z-index: 1500;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                overflow: hidden;
-                transform: translateY(100%);
-                transition: transform 0.3s ease-in-out;
-                border: none;
-                pointer-events: auto;
-            `;
-        } else {
-            // Desktop: Side modal
-            modal.style.cssText = `
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                width: 320px;
-                max-height: calc(100% - 40px);
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-                z-index: 1500;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                overflow: hidden;
-                transform: translateX(340px);
-                transition: transform 0.3s ease-in-out;
-                border: 1px solid #e0e0e0;
-                pointer-events: auto;
-            `;
-        }
-        
-        const headerPadding = isMobile ? '16px' : '20px';
-        const contentPadding = isMobile ? '16px' : '20px';
-        const titleFontSize = isMobile ? '16px' : '18px';
-        const closeButtonSize = isMobile ? '32px' : '28px';
-        
-        modal.innerHTML = `
-            <div style="
-                position: relative;
-                background: linear-gradient(135deg, ${color}22, ${color}11);
-                padding: ${headerPadding};
-                border-bottom: 1px solid #e0e0e0;
-            ">
-                <button onclick="closeCurrentModal()" style="
-                    position: absolute;
-                    top: 8px;
-                    right: 8px;
-                    background: rgba(255,255,255,0.9);
-                    border: none;
-                    width: ${closeButtonSize};
-                    height: ${closeButtonSize};
-                    border-radius: 50%;
-                    font-size: 18px;
-                    color: #666;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s;
-                    backdrop-filter: blur(4px);
-                " onmouseover="this.style.backgroundColor='rgba(255,255,255,1)'; this.style.color='#333'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.9)'; this.style.color='#666'">×</button>
-                
-                <div style="
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: ${isMobile ? '8px' : '12px'};
-                ">
-                    <div style="
-                        width: ${isMobile ? '16px' : '20px'};
-                        height: ${isMobile ? '16px' : '20px'};
-                        background-color: ${color};
-                        border-radius: 50%;
-                        margin-right: ${isMobile ? '8px' : '10px'};
-                        border: 2px solid white;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-                    "></div>
-                    <h3 style="
-                        margin: 0;
-                        font-size: ${titleFontSize};
-                        font-weight: 600;
-                        color: #333;
-                        line-height: 1.2;
-                    ">${neighborhood.displayName}</h3>
-                </div>
-                
-                <div style="
-                    display: flex;
-                    gap: 6px;
-                    flex-wrap: wrap;
-                ">
-                    <span style="
-                        display: inline-block;
-                        background-color: ${color};
-                        color: white;
-                        padding: ${isMobile ? '4px 8px' : '6px 12px'};
-                        border-radius: 12px;
-                        font-size: ${isMobile ? '11px' : '12px'};
-                        font-weight: 600;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    ">${neighborhood.pointValue} ${isMobile ? 'pts' : 'Points'}</span>
-                    <span style="
-                        display: inline-block;
-                        background-color: rgba(255,255,255,0.9);
-                        color: #495057;
-                        padding: ${isMobile ? '4px 8px' : '6px 12px'};
-                        border-radius: 12px;
-                        font-size: ${isMobile ? '11px' : '12px'};
-                        font-weight: 500;
-                        border: 1px solid #dee2e6;
-                    ">${neighborhood.borough}</span>
-                </div>
-            </div>
-            
-            <div style="
-                padding: ${contentPadding};
-                overflow-y: auto;
-                max-height: ${isMobile ? '200px' : '400px'};
-            ">
-                ${!isMobile ? `<h4 style="
-                    margin: 0 0 12px 0;
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #333;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                ">About This Neighborhood</h4>` : ''}
-                
-                <p style="
-                    margin: 0 0 ${isMobile ? '12px' : '20px'} 0;
-                    font-size: ${isMobile ? '13px' : '14px'};
-                    line-height: 1.5;
-                    color: #555;
-                ">${neighborhood.description}</p>
-                
-                <div style="
-                    padding: ${isMobile ? '12px' : '16px'};
-                    background: ${color}08;
-                    border-radius: 6px;
-                    border: 1px solid ${color}20;
-                ">
-                    <div style="
-                        display: flex;
-                        align-items: center;
-                        margin-bottom: 6px;
-                    ">
+        // Create a MapKit annotation with callout
+        const coordinate = new mapkit.Coordinate(centerLat, centerLng);
+        const annotation = new mapkit.MarkerAnnotation(coordinate, {
+            color: color,
+            title: neighborhood.displayName,
+            subtitle: `${neighborhood.pointValue} points • ${neighborhood.borough}`,
+            canShowCallout: true,
+            callout: {
+                calloutElementForAnnotation: function(annotation) {
+                    const calloutDiv = document.createElement('div');
+                    calloutDiv.style.cssText = `
+                        background: white;
+                        border-radius: ${isMobile ? '8px' : '12px'};
+                        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+                        padding: ${isMobile ? '12px' : '16px'};
+                        max-width: ${isMobile ? '240px' : '280px'};
+                        min-width: ${isMobile ? '200px' : '240px'};
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        border: 1px solid rgba(0,0,0,0.1);
+                        position: relative;
+                    `;
+                    
+                    calloutDiv.innerHTML = `
                         <div style="
-                            width: 3px;
-                            height: 12px;
-                            background: ${color};
-                            border-radius: 2px;
-                            margin-right: 6px;
-                        "></div>
-                        <h5 style="
+                            display: flex;
+                            align-items: center;
+                            margin-bottom: ${isMobile ? '8px' : '12px'};
+                        ">
+                            <div style="
+                                width: ${isMobile ? '16px' : '20px'};
+                                height: ${isMobile ? '16px' : '20px'};
+                                background-color: ${color};
+                                border-radius: 50%;
+                                margin-right: ${isMobile ? '6px' : '8px'};
+                                border: 2px solid white;
+                                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                            "></div>
+                            <h3 style="
+                                margin: 0;
+                                font-size: ${isMobile ? '14px' : '16px'};
+                                font-weight: 600;
+                                color: #333;
+                                line-height: 1.2;
+                            ">${neighborhood.displayName}</h3>
+                        </div>
+                        
+                        <div style="margin-bottom: ${isMobile ? '6px' : '8px'};">
+                            <span style="
+                                display: inline-block;
+                                background-color: ${color};
+                                color: white;
+                                padding: ${isMobile ? '3px 6px' : '4px 8px'};
+                                border-radius: 8px;
+                                font-size: ${isMobile ? '10px' : '12px'};
+                                font-weight: 600;
+                                margin-right: 6px;
+                            ">${neighborhood.pointValue} ${isMobile ? 'pts' : 'Points'}</span>
+                            <span style="
+                                color: #666;
+                                font-size: ${isMobile ? '11px' : '13px'};
+                            ">${neighborhood.borough}</span>
+                        </div>
+                        
+                        <p style="
                             margin: 0;
                             font-size: ${isMobile ? '11px' : '13px'};
-                            font-weight: 600;
-                            color: #333;
-                        ">${isMobile ? 'Scoring' : 'Scoring Challenge'}</h5>
-                    </div>
-                    <p style="
-                        margin: 0;
-                        font-size: ${isMobile ? '10px' : '12px'};
-                        color: #666;
-                        line-height: 1.4;
-                    ">${isMobile ? `Complete a challenge here for ${neighborhood.pointValue} bonus points!` : `Complete at least one challenge in this neighborhood to earn <strong>${neighborhood.pointValue} bonus points</strong> for your team!`}</p>
-                </div>
-            </div>
-        `;
-        
-        // Map container position should already be set to relative
-        
-        // Add to appropriate container
-        if (isMobile) {
-            // Mobile: Add to body for full screen overlay
-            document.body.appendChild(modal);
-        } else {
-            // Desktop: Add to map container
-            mapContainer.appendChild(modal);
-        }
-        
-        // Trigger slide-in animation
-        setTimeout(() => {
-            if (isMobile) {
-                modal.style.transform = 'translateY(0)';
-            } else {
-                modal.style.transform = 'translateX(0)';
+                            line-height: 1.4;
+                            color: #555;
+                        ">${
+                            neighborhood.description
+                        }</p>
+                    `;
+                    
+                    return calloutDiv;
+                }
             }
-        }, 10);
+        });
         
-        // Store reference for removal
-        map._currentModal = modal;
+        // Add annotation to map
+        map.addAnnotation(annotation);
+        
+        // Store reference for cleanup
+        map._currentAnnotation = annotation;
+        
+        // Show the callout immediately
+        annotation.selected = true;
     }
-    
-    /**
-     * Update popup position when map moves
-     */
-    function updatePopupPosition() {
-        const popup = map._currentDOMPopup;
-        if (popup && popup._coordinate) {
-            const point = map.convertCoordinateToPointOnPage(popup._coordinate);
-            popup.style.left = `${point.x - 140}px`;
-            popup.style.top = `${point.y - 120}px`;
-        }
-    }
+
     
     /**
      * Clean up all modals immediately (for replacement)
@@ -938,9 +719,14 @@
      * Remove current neighborhood popup/modal
      */
     function removeNeighborhoodPopup(immediate = false) {
+        // Remove annotation if it exists
+        if (map && map._currentAnnotation) {
+            map.removeAnnotation(map._currentAnnotation);
+            map._currentAnnotation = null;
+        }
         
+        // Clean up any legacy modals (for backwards compatibility)
         if (immediate) {
-            // Use the cleanup function for immediate removal
             cleanupAllModals();
         } else {
             // Remove with slide-out animation (for close button)
@@ -948,7 +734,8 @@
             if (existingModal) {
                 const isMobile = window.innerWidth <= 768;
                 if (isMobile) {
-                    existingModal.style.transform = 'translateY(100%)';
+                    existingModal.style.opacity = '0';
+                    existingModal.style.transform = 'translateY(20px) scale(0.95)';
                 } else {
                     existingModal.style.transform = 'translateX(340px)';
                 }
