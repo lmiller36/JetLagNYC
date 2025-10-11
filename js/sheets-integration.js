@@ -462,7 +462,7 @@ async function getAllTeamScores() {
             const sheetName = sheet.properties.title;
             
             // Skip system sheets
-            if (sheetName === 'Neighborhoods' || sheetName === 'Master' || sheetName.startsWith('_')) {
+            if (sheetName === 'Neighborhoods' || sheetName === 'Challenges' || sheetName === 'Master' || sheetName.startsWith('_')) {
                 continue;
             }
             
